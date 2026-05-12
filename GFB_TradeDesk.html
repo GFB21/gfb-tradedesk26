@@ -364,11 +364,11 @@ function rTbl(){
   if(!total) return "<div class='empty'><div style='font-size:40px;opacity:.3;margin-bottom:12px'>📦</div><p>Sin pedidos</p></div>";
   var pages=Math.ceil(total/PS)||1, sl=list.slice((PN-1)*PS,PN*PS);
   var cols=[{f:"num",l:"Pedido"},{f:"fecha",l:"Fecha"},{f:"alias_cli",l:"Cliente"},{f:"alias_prov",l:"Proveedor"},{f:"estado",l:"Estado"},{f:"etd",l:"ETD"},{f:"eta",l:"ETA"},{f:"factura",l:"Factura"},{f:"buque",l:"Buque"},{f:"obs_c",l:"Obs"}];
-  var th=cols.map(function(c){return "<th class='"+(SF===c.f?"srt":"")+"' onclick='ds(""+c.f+"")'>"+c.l+" "+(SF===c.f?(SD===1?"↑":"↓"):"↕")+"</th>";}).join("");
-  var tb=sl.map(function(p){var d=du(p.eta),ec="";if(p.estado==="IN TRANSIT"&&d!==null){if(d<0)ec="ov";else if(d<=7)ec="hot";}return "<tr onclick='od(""+p.id+"")'><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fecha)+"</td><td>"+es(p.alias_cli||p.cliente||"-")+"</td><td>"+es(p.alias_prov||p.proveedor||"-")+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='acc'>"+es(p.factura||"-")+"</td><td class='tl'>"+es(p.buque||"-")+"</td><td class='dim'>"+es(p.obs_c||"")+"</td></tr>";}).join("");
+  var th=cols.map(function(c){var sc=SF===c.f?"srt":"";var ar=SF===c.f?(SD===1?"↑":"↓"):"↕";return "<th class='"+sc+"' onclick='ds(this)' data-f='"+c.f+"'>"+c.l+" "+ar+"</th>";}).join("");
+  var tb=sl.map(function(p){var d=du(p.eta),ec="";if(p.estado==="IN TRANSIT"&&d!==null){if(d<0)ec="ov";else if(d<=7)ec="hot";}return "<tr class='pcard-click' data-id='"+p.id+"'><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fecha)+"</td><td>"+es(p.alias_cli||p.cliente||"-")+"</td><td>"+es(p.alias_prov||p.proveedor||"-")+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='acc'>"+es(p.factura||"-")+"</td><td class='tl'>"+es(p.buque||"-")+"</td><td class='dim'>"+es(p.obs_c||"")+"</td></tr>";}).join("");
   return "<div class='tbl-wrap'><div class='tbl-info'><span>"+total+" pedidos</span></div><div style='overflow-x:auto'><table><thead><tr>"+th+"</tr></thead><tbody>"+tb+"</tbody></table></div></div>"+(pages>1?rPg(PN,pages,total):"");
 }
-function ds(f){if(SF===f)SD*=-1;else{SF=f;SD=1;}PN=1;render();}
+function ds(el){var f=el.dataset.f;if(SF===f)SD*=-1;else{SF=f;SD=1;}PN=1;render();}
 function rPg(cur,tot,cnt){
   var b="<button class='pgb' onclick='gp2("+(cur-1)+")' "+(cur<=1?"disabled":"")+">←</button>";
   var rng=[1,Math.max(1,cur-1),cur,Math.min(tot,cur+1),tot].filter(function(v,i,a){return a.indexOf(v)===i;}).sort(function(a,b){return a-b;});
@@ -401,7 +401,7 @@ function rCard(p,type){
   var ship=(p.buque||p.imo||p.cont)?"<div class='pship'><div><div class='psl'>Buque</div><div class='psv "+(p.buque?"":"pse")+"'>"+es(p.buque||"-")+"</div></div><div><div class='psl'>IMO</div><div class='psv "+(p.imo?"":"pse")+"'>"+es(p.imo||"-")+"</div></div><div><div class='psl'>Contenedor</div><div class='psv "+(p.cont?"":"pse")+"'>"+es(p.cont||"-")+"</div></div></div>":"";
   var obs=p.obs_c?"<div class='pobs'>"+es(p.obs_c)+"</div>":"";
   var foot=type==="tran"?"<div class='pfoot'>"+plinks(p)+"</div>":"";
-  return "<div class='pcard "+cls+"' onclick='od(""+p.id+"")'><div class='pch'><div><div class='pn'>"+es(p.num)+(p.confirmado?" <small style='color:var(--green2)'>CONF</small>":"")+"</div><div class='pcl'>"+es(p.alias_cli||p.cliente||"-")+"</div><div class='ppr'>"+es(p.producto||"-")+"</div></div>"+chip(p.estado)+"</div><div class='pmeta'><div><div class='pml'>Proveedor</div><div class='pmv'>"+es(p.alias_prov||p.proveedor||"-")+"</div></div><div><div class='pml'>ETD</div><div class='pmv'>"+fd(p.etd)+"</div></div><div><div class='pml'>ETA</div><div class='pmv "+ec+"'>"+ev+"</div></div><div><div class='pml'>Factura</div><div class='pmv'>"+es(p.factura||"-")+"</div></div><div><div class='pml'>Transportista</div><div class='pmv'>"+es(st(p.transportista))+"</div></div><div><div class='pml'>Incoterm</div><div class='pmv'>"+es(p.incoterm||"-")+"</div></div></div>"+ship+obs+foot+"</div>";
+  return "<div class='pcard "+cls+"' class='pcard-click' data-id='"+p.id+"'><div class='pch'><div><div class='pn'>"+es(p.num)+(p.confirmado?" <small style='color:var(--green2)'>CONF</small>":"")+"</div><div class='pcl'>"+es(p.alias_cli||p.cliente||"-")+"</div><div class='ppr'>"+es(p.producto||"-")+"</div></div>"+chip(p.estado)+"</div><div class='pmeta'><div><div class='pml'>Proveedor</div><div class='pmv'>"+es(p.alias_prov||p.proveedor||"-")+"</div></div><div><div class='pml'>ETD</div><div class='pmv'>"+fd(p.etd)+"</div></div><div><div class='pml'>ETA</div><div class='pmv "+ec+"'>"+ev+"</div></div><div><div class='pml'>Factura</div><div class='pmv'>"+es(p.factura||"-")+"</div></div><div><div class='pml'>Transportista</div><div class='pmv'>"+es(st(p.transportista))+"</div></div><div><div class='pml'>Incoterm</div><div class='pmv'>"+es(p.incoterm||"-")+"</div></div></div>"+ship+obs+foot+"</div>";
 }
 function rRefs(type){
   var items=DB[type]||[], q=SQ.toLowerCase();
@@ -431,6 +431,10 @@ document.addEventListener("DOMContentLoaded",function(){
   document.getElementById("syncPill").addEventListener("click",syncAll);
   document.getElementById("overlay").addEventListener("click",function(e){if(e.target.id==="overlay")cd();});
   document.getElementById("sInput").addEventListener("input",function(){SQ=this.value.trim();PN=1;render();});
+  document.getElementById("content").addEventListener("click",function(e){
+    var tr=e.target.closest("[data-oid]");
+    if(tr) od(tr.dataset.oid);
+  });
   document.querySelectorAll(".sb-item").forEach(function(el){el.addEventListener("click",function(){showPage(this.dataset.pg);});});
   if(TOKEN){if(loadCache()){render();syncAll();}else syncAll();}
   else{openCfg();document.getElementById("content").innerHTML="<div class='empty'><div style='font-size:40px;opacity:.3;margin-bottom:12px'>🔑</div><p>Introduce tu token de Notion para empezar</p></div>";}
