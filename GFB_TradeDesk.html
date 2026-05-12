@@ -770,13 +770,15 @@ function updateCounts(){
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────
-if(TOKEN){
-  if(loadCache()){ render(); syncAll(); }
-  else syncAll();
-} else {
-  openConfig();
-  document.getElementById("content").innerHTML=`<div class="empty"><div class="ei">🔑</div><p>Introduce tu token de Notion para empezar</p></div>`;
-}
+document.addEventListener('DOMContentLoaded', function(){
+  if(TOKEN){
+    if(loadCache()){ render(); syncAll(); }
+    else syncAll();
+  } else {
+    openConfig();
+    document.getElementById("content").innerHTML='<div class="empty"><div class="ei">🔑</div><p>Introduce tu token de Notion para empezar</p></div>';
+  }
+});
 </script>
 </body>
 </html>
