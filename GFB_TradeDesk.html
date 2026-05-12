@@ -6,778 +6,434 @@
 <title>GFB TradeDesk</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0d1117;--s1:#161b22;--s2:#1c2330;--s3:#21262d;
-  --border:#30363d;--border2:#3d444d;
-  --accent:#2f81f7;--accent2:#58a6ff;
-  --green:#3fb950;--green2:#56d364;
-  --amber:#d29922;--amber2:#e3b341;
-  --red:#da3633;--red2:#f85149;
-  --purple:#8957e5;--purple2:#a371f7;
-  --teal2:#79c0ff;
-  --text:#e6edf3;--text2:#8b949e;--text3:#484f58;
-  --mono:'DM Mono',monospace;--sans:'Bricolage Grotesque',sans-serif;
-}
+:root{--bg:#0d1117;--s1:#161b22;--s2:#1c2330;--s3:#21262d;--border:#30363d;--border2:#3d444d;--accent:#2f81f7;--accent2:#58a6ff;--green2:#56d364;--amber2:#e3b341;--red2:#f85149;--purple2:#a371f7;--teal2:#79c0ff;--text:#e6edf3;--text2:#8b949e;--text3:#484f58;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;}
-
-/* LAYOUT */
+body{background:var(--bg);color:var(--text);font-family:Bricolage Grotesque,sans-serif;min-height:100vh;}
 .shell{display:flex;height:100vh;overflow:hidden;}
-.sidebar{width:220px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+.sidebar{width:220px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .topbar{height:52px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;}
 .content{flex:1;overflow:auto;padding:20px;}
-
-/* SIDEBAR */
 .sb-logo{padding:16px;border-bottom:1px solid var(--border);}
-.sb-logo .co{font-size:10px;font-family:var(--mono);color:var(--accent2);text-transform:uppercase;letter-spacing:1px;}
-.sb-logo .name{font-size:15px;font-weight:800;margin-top:2px;}
-.sb-nav{padding:8px 0;flex:1;}
-.sb-group{padding:8px 16px 4px;font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
+.sb-logo .co{font-size:10px;color:var(--accent2);text-transform:uppercase;letter-spacing:1px;}
+.sb-logo .nm{font-size:16px;font-weight:800;margin-top:2px;}
+.sb-grp{padding:8px 16px 4px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
 .sb-item{display:flex;align-items:center;gap:9px;padding:7px 16px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;}
 .sb-item:hover{background:var(--s2);color:var(--text);}
 .sb-item.active{background:rgba(47,129,247,.1);color:var(--accent2);border-left-color:var(--accent2);}
-.sb-item .ic{font-size:15px;width:20px;text-align:center;}
-.sb-count{margin-left:auto;background:var(--s3);color:var(--text2);font-family:var(--mono);font-size:10px;padding:1px 7px;border-radius:10px;}
-.sb-footer{padding:12px 16px;border-top:1px solid var(--border);}
-.sync-pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;padding:5px 10px;border-radius:20px;border:1px solid var(--border);color:var(--text3);cursor:pointer;width:100%;justify-content:center;transition:all .15s;}
+.sb-cnt{margin-left:auto;background:var(--s3);color:var(--text2);font-size:10px;padding:1px 7px;border-radius:10px;}
+.sb-foot{padding:12px 16px;border-top:1px solid var(--border);margin-top:auto;}
+.sync-pill{display:flex;align-items:center;gap:6px;font-size:10px;padding:6px 10px;border-radius:20px;border:1px solid var(--border);color:var(--text3);cursor:pointer;justify-content:center;transition:all .15s;}
 .sync-pill:hover{border-color:var(--accent);color:var(--accent2);}
 .sync-pill.ok{border-color:rgba(63,185,80,.3);color:var(--green2);}
 .sync-pill.loading{border-color:rgba(210,153,34,.3);color:var(--amber2);}
 .sync-pill.error{border-color:rgba(218,54,51,.3);color:var(--red2);}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 1.5s infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-
-/* TOPBAR */
-.page-title{font-size:15px;font-weight:700;flex:1;}
-.search-box{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;width:280px;}
-.search-box input{background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;width:100%;}
-.search-box input::placeholder{color:var(--text3);}
-.btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--s2);color:var(--text2);transition:all .12s;white-space:nowrap;font-family:var(--sans);}
+.sdot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:bl 1.5s infinite;}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.2}}
+.page-ttl{font-size:15px;font-weight:700;flex:1;}
+.sbox{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;width:280px;}
+.sbox input{background:transparent;border:none;color:var(--text);font-size:12px;outline:none;width:100%;}
+.sbox input::placeholder{color:var(--text3);}
+.btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--s2);color:var(--text2);transition:all .12s;white-space:nowrap;}
 .btn:hover{border-color:var(--accent);color:var(--accent2);}
-.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
-.btn.primary:hover{background:#1a6fd4;}
-.btn.meeting{background:rgba(138,87,229,.15);color:var(--purple2);border-color:rgba(138,87,229,.3);}
-.btn.meeting.on{background:var(--purple);color:#fff;border-color:var(--purple);}
-
-/* CONFIG MODAL */
+.btn.pri{background:var(--accent);color:#fff;border-color:var(--accent);}
+.btn.pri:hover{background:#1a6fd4;}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;}
 .modal-bg.open{display:flex;}
-.modal{background:var(--s1);border:1px solid var(--border);border-radius:10px;width:520px;padding:24px;}
-.modal h2{font-size:16px;font-weight:700;margin-bottom:6px;}
-.modal p{font-size:12px;color:var(--text2);margin-bottom:20px;line-height:1.6;}
-.modal label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:5px;}
-.modal input{background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 12px;width:100%;outline:none;margin-bottom:14px;transition:border-color .15s;}
+.modal{background:var(--s1);border:1px solid var(--border);border-radius:10px;width:460px;padding:24px;}
+.modal h2{font-size:15px;font-weight:700;margin-bottom:8px;}
+.modal p{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6;}
+.modal label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:5px;}
+.modal input{background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:12px;padding:8px 12px;width:100%;outline:none;margin-bottom:14px;}
 .modal input:focus{border-color:var(--accent);}
 .modal input::placeholder{color:var(--text3);}
-.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:4px;}
-.warning-box{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.25);border-radius:6px;padding:10px 14px;font-size:11px;color:var(--amber2);margin-bottom:16px;line-height:1.5;}
-
-/* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
-.stat{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px 16px;cursor:pointer;transition:border-color .12s;}
-.stat:hover{border-color:var(--accent);}
-.stat .sv{font-size:24px;font-weight:700;font-family:var(--mono);line-height:1;}
-.stat .sl{font-size:10px;color:var(--text2);margin-top:4px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;}
-
-/* FILTERS */
-.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
-.fchip{padding:4px 12px;border-radius:20px;font-family:var(--mono);font-size:11px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .12s;}
-.fchip:hover{border-color:var(--accent);color:var(--accent2);}
-.fchip.on{border-color:var(--accent);background:rgba(47,129,247,.12);color:var(--accent2);}
-
-/* TABLE */
+.mfooter{display:flex;gap:8px;justify-content:flex-end;}
+.warn{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.25);border-radius:6px;padding:10px 14px;font-size:11px;color:var(--amber2);margin-bottom:14px;}
 .tbl-wrap{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.tbl-info{padding:9px 16px;font-family:var(--mono);font-size:11px;color:var(--text2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
+.tbl-info{padding:9px 16px;font-size:11px;color:var(--text2);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
 thead tr{background:var(--s2);position:sticky;top:0;z-index:5;}
-th{padding:9px 12px;text-align:left;font-family:var(--mono);font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);white-space:nowrap;cursor:pointer;border-bottom:1px solid var(--border);}
+th{padding:9px 12px;text-align:left;font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);white-space:nowrap;cursor:pointer;border-bottom:1px solid var(--border);}
 th:hover{color:var(--text2);}
+th.srt{color:var(--accent2);}
 tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer;}
 tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:var(--s2);}
-td{padding:8px 12px;vertical-align:middle;}
-td.mono{font-family:var(--mono);font-size:11px;}
-td.accent{font-family:var(--mono);font-size:11px;color:var(--accent2);}
-td.dim{font-size:11px;color:var(--text2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.chip{display:inline-block;padding:2px 8px;border-radius:4px;font-family:var(--mono);font-size:10px;font-weight:500;white-space:nowrap;}
-.c-transit{background:rgba(138,87,229,.2);color:var(--purple2);}
-.c-delivered{background:rgba(63,185,80,.15);color:var(--green2);}
-.c-pendiente{background:rgba(210,153,34,.15);color:var(--amber2);}
-.c-cancelled{background:rgba(72,79,88,.3);color:var(--text3);}
-.eta-hot{color:var(--amber2);font-weight:600;}
-.eta-warn{color:var(--red2);font-weight:600;}
-
-/* MEETING VIEW */
-.meeting-banner{background:linear-gradient(135deg,rgba(138,87,229,.12),rgba(47,129,247,.08));border:1px solid rgba(138,87,229,.25);border-radius:10px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
-.mb-left h2{font-size:20px;font-weight:800;letter-spacing:-.3px;}
-.mb-left .mdate{font-family:var(--mono);font-size:11px;color:var(--text2);margin-top:4px;}
-.mb-stats{display:flex;gap:20px;}
-.mbs{text-align:center;}
-.mbs .mn{font-size:28px;font-weight:800;font-family:var(--mono);line-height:1;}
-.mbs .ml{font-size:10px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;margin-top:3px;}
-
-.meeting-section{margin-bottom:32px;}
-.msec-hdr{display:flex;align-items:center;gap:12px;padding:12px 18px;border-radius:8px;margin-bottom:14px;}
-.msec-hdr.confirmed{background:rgba(47,129,247,.08);border:1px solid rgba(47,129,247,.2);}
-.msec-hdr.unconfirmed{background:rgba(210,153,34,.06);border:1px solid rgba(210,153,34,.15);}
-.msec-hdr.transit{background:rgba(138,87,229,.08);border:1px solid rgba(138,87,229,.2);}
-.msec-hdr.sindoc{background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.15);}
-.msec-icon{font-size:22px;}
-.msec-title{font-size:16px;font-weight:700;}
-.msec-count{font-family:var(--mono);font-size:12px;color:var(--text2);margin-left:auto;}
-
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;}
+td{padding:8px 12px;vertical-align:middle;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+td.acc{font-size:11px;color:var(--accent2);}
+td.dim{font-size:11px;color:var(--text2);}
+td.tl{font-size:11px;color:var(--teal2);}
+.chip{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:500;white-space:nowrap;}
+.ct{background:rgba(138,87,229,.2);color:var(--purple2);}
+.cd{background:rgba(63,185,80,.15);color:var(--green2);}
+.cp{background:rgba(210,153,34,.15);color:var(--amber2);}
+.cc{background:rgba(72,79,88,.3);color:var(--text3);}
+.hot{color:var(--amber2);font-weight:600;}
+.ov{color:var(--red2);font-weight:600;}
+.mbanner{background:linear-gradient(135deg,rgba(138,87,229,.12),rgba(47,129,247,.08));border:1px solid rgba(138,87,229,.25);border-radius:10px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.mbanner h2{font-size:20px;font-weight:800;}
+.mbanner .mdt{font-size:11px;color:var(--text2);margin-top:4px;}
+.mstats{display:flex;gap:20px;}
+.mst{text-align:center;}
+.mst .mn{font-size:28px;font-weight:800;line-height:1;}
+.mst .ml{font-size:10px;color:var(--text2);text-transform:uppercase;margin-top:3px;}
+.msec{margin-bottom:32px;}
+.msh{display:flex;align-items:center;gap:12px;padding:12px 18px;border-radius:8px;margin-bottom:14px;}
+.msh.conf{background:rgba(47,129,247,.08);border:1px solid rgba(47,129,247,.2);}
+.msh.unco{background:rgba(210,153,34,.06);border:1px solid rgba(210,153,34,.15);}
+.msh.tran{background:rgba(138,87,229,.08);border:1px solid rgba(138,87,229,.2);}
+.msh.sdoc{background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.15);}
+.msi{font-size:22px;}
+.mst2{font-size:16px;font-weight:700;}
+.msc2{font-size:12px;color:var(--text2);margin-left:auto;}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
 .pcard{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s;}
 .pcard:hover{border-color:var(--accent2);transform:translateY(-2px);}
-.pcard.urgent{border-top:2px solid var(--amber2);}
-.pcard.overdue{border-top:2px solid var(--red2);}
-.pcard.normal{border-top:2px solid var(--purple2);}
-.pcard.confirmed{border-top:2px solid var(--accent2);}
-.pcard.unconfirmed{border-top:2px solid var(--text3);}
-.pcard.sindoc{border-top:2px solid var(--red2);}
-
-.pc-head{padding:12px 14px 8px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
-.pc-left .pc-num{font-family:var(--mono);font-size:11px;color:var(--accent2);}
-.pc-left .pc-client{font-size:14px;font-weight:700;margin-top:2px;line-height:1.2;}
-.pc-left .pc-product{font-size:11px;color:var(--text2);margin-top:3px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-.pc-meta{padding:0 14px 10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 10px;}
-.pcm{}
-.pcm-l{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
-.pcm-v{font-family:var(--mono);font-size:11px;color:var(--text);}
-.pcm-v.hot{color:var(--amber2);font-weight:600;}
-.pcm-v.overdue{color:var(--red2);font-weight:600;}
-.pcm-v.ok{color:var(--green2);}
-.pcm-v.ship{color:var(--teal2);}
-
-.pc-ship{background:var(--s2);border-top:1px solid var(--border);padding:8px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
-.pcs-l{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;}
-.pcs-v{font-family:var(--mono);font-size:11px;color:var(--teal2);}
-.pcs-v.empty{color:var(--text3);font-style:italic;}
-
-.pc-obs{padding:8px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--text2);line-height:1.5;font-style:italic;}
-
-.pc-footer{padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:5px;flex-wrap:wrap;}
-.pc-link{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;font-family:var(--mono);font-size:10px;text-decoration:none;border:1px solid var(--border);color:var(--text2);transition:all .12s;cursor:pointer;background:transparent;}
-.pc-link.msc:hover{border-color:#ff4d6d;color:#ff4d6d;}
-.pc-link.wanhai:hover{border-color:var(--teal2);color:var(--teal2);}
-.pc-link.cma:hover{border-color:#ff7a8a;color:#ff7a8a;}
-.pc-link.vf:hover{border-color:var(--green2);color:var(--green2);}
-.pc-link.mt:hover{border-color:var(--amber2);color:var(--amber2);}
-
-/* DETAIL PANEL */
+.pu{border-top:2px solid var(--amber2);}
+.po{border-top:2px solid var(--red2);}
+.pt{border-top:2px solid var(--purple2);}
+.pc2{border-top:2px solid var(--accent2);}
+.pp{border-top:2px solid var(--text3);}
+.ps{border-top:2px solid var(--red2);}
+.pch{padding:12px 14px 8px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.pn{font-size:11px;color:var(--accent2);}
+.pcl{font-size:14px;font-weight:700;margin-top:2px;line-height:1.2;}
+.ppr{font-size:11px;color:var(--text2);margin-top:3px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pmeta{padding:0 14px 10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 10px;}
+.pml{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+.pmv{font-size:11px;color:var(--text);}
+.pmv.hot{color:var(--amber2);font-weight:600;}
+.pmv.ov{color:var(--red2);font-weight:600;}
+.pship{background:var(--s2);border-top:1px solid var(--border);padding:8px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+.psl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;}
+.psv{font-size:11px;color:var(--teal2);}
+.pse{color:var(--text3);font-style:italic;}
+.pobs{padding:8px 14px;border-top:1px solid var(--border);font-size:11px;color:var(--text2);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pfoot{padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:5px;flex-wrap:wrap;}
+.plnk{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;font-size:10px;text-decoration:none;border:1px solid var(--border);color:var(--text2);transition:all .12s;background:transparent;}
+.plnk.msc:hover{border-color:#ff4d6d;color:#ff4d6d;}
+.plnk.wh:hover{border-color:var(--teal2);color:var(--teal2);}
+.plnk.cma:hover{border-color:#ff7a8a;color:#ff7a8a;}
+.plnk.vf:hover{border-color:var(--green2);color:var(--green2);}
+.plnk.mt:hover{border-color:var(--amber2);color:var(--amber2);}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:flex-start;justify-content:flex-end;}
 .overlay.open{display:flex;}
-.dpanel{width:540px;height:100vh;background:var(--s1);border-left:1px solid var(--border);overflow-y:auto;}
-.dp-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:sticky;top:0;background:var(--s1);z-index:10;}
-.dp-num{font-family:var(--mono);font-size:12px;color:var(--accent2);}
-.dp-client{font-size:16px;font-weight:700;margin-top:2px;}
-.dp-close{background:var(--s2);border:1px solid var(--border);border-radius:6px;color:var(--text2);width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all .12s;}
-.dp-close:hover{border-color:var(--red);color:var(--red2);}
-.dp-body{padding:20px;}
-.dp-sec{margin-bottom:20px;}
-.dp-sec-title{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
-.dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.dp-field .dp-l{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
-.dp-field .dp-v{font-size:13px;color:var(--text);}
-.dp-field .dp-v.mono{font-family:var(--mono);font-size:12px;}
-.dp-field .dp-v.obs{font-size:12px;color:var(--text2);white-space:pre-wrap;line-height:1.6;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:4px;}
-.dp-links{display:flex;gap:7px;flex-wrap:wrap;}
-.dp-link{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;font-family:var(--mono);font-size:11px;text-decoration:none;border:1px solid var(--border);color:var(--text2);background:var(--s2);transition:all .12s;}
-.dp-link.msc:hover{border-color:#ff4d6d;color:#ff4d6d;}
-.dp-link.wanhai:hover{border-color:var(--teal2);color:var(--teal2);}
-.dp-link.cma:hover{border-color:#ff7a8a;color:#ff7a8a;}
-.dp-link.vf:hover{border-color:var(--green2);color:var(--green2);}
-.dp-link.mt:hover{border-color:var(--amber2);color:var(--amber2);}
-
-/* EDIT FIELDS IN DETAIL */
-.dp-edit{background:var(--s2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:12px;padding:6px 10px;width:100%;outline:none;transition:border-color .15s;}
-.dp-edit:focus{border-color:var(--accent2);}
-.dp-edit::placeholder{color:var(--text3);}
-.dp-save-btn{margin-top:10px;width:100%;}
-
-/* PAGINATION */
-.pagination{display:flex;align-items:center;gap:6px;justify-content:center;padding:16px;}
-.pg-btn{padding:5px 10px;border-radius:5px;font-family:var(--mono);font-size:11px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .12s;}
-.pg-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent2);}
-.pg-btn:disabled{opacity:.3;cursor:default;}
-.pg-btn.active{background:rgba(47,129,247,.15);border-color:var(--accent);color:var(--accent2);}
-.pg-info{font-family:var(--mono);font-size:11px;color:var(--text3);}
-
-/* EMPTY / LOADING */
+.dpanel{width:520px;height:100vh;background:var(--s1);border-left:1px solid var(--border);overflow-y:auto;}
+.dph{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:sticky;top:0;background:var(--s1);z-index:10;}
+.dpnum{font-size:12px;color:var(--accent2);}
+.dpcli{font-size:16px;font-weight:700;margin-top:2px;}
+.dpc{background:var(--s2);border:1px solid var(--border);border-radius:6px;color:var(--text2);width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all .12s;}
+.dpc:hover{border-color:#da3633;color:var(--red2);}
+.dpb{padding:20px;}
+.dps{margin-bottom:20px;}
+.dpst{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.dpg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.dpl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.dpv{font-size:13px;color:var(--text);}
+.dpv.obs{font-size:12px;color:var(--text2);white-space:pre-wrap;line-height:1.6;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:4px;}
+.dplnks{display:flex;gap:7px;flex-wrap:wrap;}
+.dplnk{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;font-size:11px;text-decoration:none;border:1px solid var(--border);color:var(--text2);background:var(--s2);transition:all .12s;}
+.dplnk.msc:hover{border-color:#ff4d6d;color:#ff4d6d;}
+.dplnk.wh:hover{border-color:var(--teal2);color:var(--teal2);}
+.dplnk.cma:hover{border-color:#ff7a8a;color:#ff7a8a;}
+.dplnk.vf:hover{border-color:var(--green2);color:var(--green2);}
+.dplnk.mt:hover{border-color:var(--amber2);color:var(--amber2);}
+.pagi{display:flex;align-items:center;gap:6px;justify-content:center;padding:16px;}
+.pgb{padding:5px 10px;border-radius:5px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .12s;}
+.pgb:hover:not(:disabled){border-color:var(--accent);color:var(--accent2);}
+.pgb:disabled{opacity:.3;cursor:default;}
+.pgb.on{background:rgba(47,129,247,.15);border-color:var(--accent);color:var(--accent2);}
 .empty{text-align:center;padding:60px 20px;color:var(--text3);}
-.empty .ei{font-size:40px;margin-bottom:12px;opacity:.3;}
-.empty p{font-size:13px;font-family:var(--mono);}
-.loading{text-align:center;padding:60px;color:var(--text2);font-family:var(--mono);font-size:13px;}
-.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle;}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-::-webkit-scrollbar{width:5px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
-@media(max-width:800px){.sidebar{display:none;}.main{margin:0;}.stats-row{grid-template-columns:repeat(2,1fr);}.dpanel{width:100vw;}}
+.loading{text-align:center;padding:60px;color:var(--text2);font-size:13px;}
+.spin{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:sp .8s linear infinite;margin-right:8px;vertical-align:middle;}
+@keyframes sp{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+@media(max-width:800px){.sidebar{display:none;}.dpanel{width:100vw;}}
 </style>
 </head>
 <body>
 
-<!-- CONFIG MODAL -->
-<div class="modal-bg" id="configModal">
+<div class="modal-bg" id="cfgModal">
   <div class="modal">
-    <h2>⚙️ Conectar con Notion</h2>
-    <p>Introduce tu token de integración de Notion. Solo se guarda en tu navegador, nunca se envía a ningún servidor.</p>
-    <div class="warning-box">⚠️ No compartas este token con nadie. Es la llave de acceso a tu Notion.</div>
-    <label>Token de integración (secret_...)</label>
-    <input type="password" id="cfgToken" placeholder="secret_xxxxxxxxxxxxxxxx" />
-    <div class="modal-footer">
-      <button class="btn" onclick="closeConfig()">Cancelar</button>
-      <button class="btn primary" onclick="saveConfig()">Guardar y conectar</button>
+    <h2>Conectar con Notion</h2>
+    <p>Introduce tu token de integracion. Solo se guarda en tu navegador, nunca sale de tu ordenador.</p>
+    <div class="warn">No compartas este token. Es la llave de acceso a tu Notion.</div>
+    <label>Token (secret_...)</label>
+    <input type="password" id="cfgTok" placeholder="secret_xxxxxxxxxxxxxxxx" />
+    <div class="mfooter">
+      <button class="btn" id="btnCancel">Cancelar</button>
+      <button class="btn pri" id="btnSave">Guardar y conectar</button>
     </div>
   </div>
 </div>
 
 <div class="shell">
-<!-- SIDEBAR -->
-<nav class="sidebar">
-  <div class="sb-logo">
-    <div class="co">GFB TradeDesk</div>
-    <div class="name">Exportaciones</div>
-  </div>
-  <div class="sb-nav">
-    <div class="sb-group">Vistas</div>
-    <div class="sb-item active" onclick="showPage('todos')" id="nav-todos"><span class="ic">📦</span>Todos los pedidos<span class="sb-count" id="cnt-todos">—</span></div>
-    <div class="sb-item" onclick="showPage('confirmados')" id="nav-confirmados"><span class="ic">✅</span>Confirmados<span class="sb-count" id="cnt-confirmados">—</span></div>
-    <div class="sb-item" onclick="showPage('sinconfirmar')" id="nav-sinconfirmar"><span class="ic">⏳</span>Sin confirmar<span class="sb-count" id="cnt-sinconfirmar">—</span></div>
-    <div class="sb-item" onclick="showPage('transit')" id="nav-transit"><span class="ic">🚢</span>IN TRANSIT<span class="sb-count" id="cnt-transit">—</span></div>
-    <div class="sb-item" onclick="showPage('sindoc')" id="nav-sindoc"><span class="ic">📄</span>Sin justif.<span class="sb-count" id="cnt-sindoc">—</span></div>
-    <div class="sb-group">Reunión</div>
-    <div class="sb-item" onclick="showPage('reunion')" id="nav-reunion"><span class="ic">📊</span>Vista reunión</div>
-    <div class="sb-group">Referencias</div>
-    <div class="sb-item" onclick="showPage('clientes')" id="nav-clientes"><span class="ic">🏢</span>Clientes<span class="sb-count" id="cnt-clientes">—</span></div>
-    <div class="sb-item" onclick="showPage('proveedores')" id="nav-proveedores"><span class="ic">🏭</span>Proveedores<span class="sb-count" id="cnt-proveedores">—</span></div>
-    <div class="sb-item" onclick="showPage('transportistas')" id="nav-transportistas"><span class="ic">🚛</span>Transportistas<span class="sb-count" id="cnt-transportistas">—</span></div>
-  </div>
-  <div class="sb-footer">
-    <div class="sync-pill" id="syncPill" onclick="syncAll()">
-      <span class="sync-dot"></span>
-      <span id="syncMsg">Sin conectar</span>
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="co">GFB TradeDesk</div>
+      <div class="nm">Exportaciones</div>
     </div>
-  </div>
-</nav>
-
-<!-- MAIN -->
-<div class="main">
-  <div class="topbar">
-    <div class="page-title" id="pageTitle">Todos los pedidos</div>
-    <div class="search-box">
-      <span style="color:var(--text3)">🔍</span>
-      <input type="text" id="searchInput" placeholder="Buscar pedido, cliente, factura..." oninput="onSearch()"/>
+    <div id="sbNav">
+      <div class="sb-grp">Vistas</div>
+      <div class="sb-item active" data-pg="todos"><span>📦</span>Activos<span class="sb-cnt" id="cnt-todos">-</span></div>
+      <div class="sb-item" data-pg="confirmados"><span>✅</span>Confirmados<span class="sb-cnt" id="cnt-confirmados">-</span></div>
+      <div class="sb-item" data-pg="sinconfirmar"><span>⏳</span>Sin confirmar<span class="sb-cnt" id="cnt-sinconfirmar">-</span></div>
+      <div class="sb-item" data-pg="transit"><span>🚢</span>IN TRANSIT<span class="sb-cnt" id="cnt-transit">-</span></div>
+      <div class="sb-item" data-pg="sindoc"><span>📄</span>Sin justif.<span class="sb-cnt" id="cnt-sindoc">-</span></div>
+      <div class="sb-grp">Reunion</div>
+      <div class="sb-item" data-pg="reunion"><span>📊</span>Vista Reunion</div>
+      <div class="sb-grp">Referencias</div>
+      <div class="sb-item" data-pg="clientes"><span>🏢</span>Clientes<span class="sb-cnt" id="cnt-clientes">-</span></div>
+      <div class="sb-item" data-pg="proveedores"><span>🏭</span>Proveedores<span class="sb-cnt" id="cnt-proveedores">-</span></div>
+      <div class="sb-item" data-pg="transportistas"><span>🚛</span>Transportistas<span class="sb-cnt" id="cnt-transportistas">-</span></div>
     </div>
-    <button class="btn" onclick="exportCSV()">⬇ CSV</button>
-    <button class="btn" onclick="openConfig()">⚙ Notion</button>
+    <div class="sb-foot">
+      <div class="sync-pill" id="syncPill"><span class="sdot"></span><span id="syncMsg">Sin conectar</span></div>
+    </div>
+  </nav>
+  <div class="main">
+    <div class="topbar">
+      <div class="page-ttl" id="pgTitle">Pedidos activos</div>
+      <div class="sbox"><span style="color:var(--text3)">🔍</span><input id="sInput" placeholder="Buscar..." type="text" /></div>
+      <button class="btn" id="btnExp">CSV</button>
+      <button class="btn" id="btnCfg">Notion</button>
+    </div>
+    <div class="content" id="content"><div class="loading"><span class="spin"></span>Cargando...</div></div>
   </div>
-  <div class="content" id="content"><div class="loading"><span class="spinner"></span>Cargando...</div></div>
-</div>
 </div>
 
-<!-- DETAIL OVERLAY -->
-<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+<div class="overlay" id="overlay">
   <div class="dpanel" id="dpanel"></div>
 </div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────
-const DB_IDS = {
-  pedidos:       "35eadf8035b080bb9edafea27374acb8",
-  clientes:      "35eadf8035b080b896c8d5fed8a64a18",
-  proveedores:   "35eadf8035b0802b953dd8a7b41dd0b8",
-  transportistas:"35eadf8035b0808c86fbe5ba1ca6f3cb"
+var IDS = {
+  pedidos:        "35eadf8035b080bb9edafea27374acb8",
+  clientes:       "35eadf8035b080b896c8d5fed8a64a18",
+  proveedores:    "35eadf8035b0802b953dd8a7b41dd0b8",
+  transportistas: "35eadf8035b0808c86fbe5ba1ca6f3cb"
 };
-const NOTION_VERSION = "2022-06-28";
-const STORAGE_KEY = "gfb_token_v1";
-const CACHE_KEY   = "gfb_cache_v1";
-const CACHE_TTL   = 5 * 60 * 1000; // 5 min
+var NV = "2022-06-28";
+var SK = "gfb_tok";
+var CK = "gfb_cache";
+var TOKEN = localStorage.getItem(SK) || "";
+var DB = {pedidos:[],clientes:[],proveedores:[],transportistas:[]};
+var PAGE = "todos", SQ = "", SF = "num", SD = 1, PN = 1, PS = 50;
 
-let TOKEN = localStorage.getItem(STORAGE_KEY) || "";
-let DATA  = { pedidos:[], clientes:[], proveedores:[], transportistas:[] };
-let currentPage = "todos";
-let searchQ = "";
-let sortField = "num";
-let sortDir = 1;
-let pgNum = 1;
-const PG_SIZE = 50;
-
-// ── NOTION API ────────────────────────────────────────────────────────
-async function notionQuery(dbId, filter=null, sorts=null){
-  if(!TOKEN){ openConfig(); return []; }
-  const body = { page_size:100 };
-  if(filter) body.filter = filter;
-  if(sorts)  body.sorts  = sorts;
-  let results = [];
-  let cursor  = null;
-  let pages   = 0;
+function ts(){ return new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}); }
+function setSt(t,m){ var e=document.getElementById("syncPill"); e.className="sync-pill "+t; document.getElementById("syncMsg").textContent=m; }
+function openCfg(){ document.getElementById("cfgTok").value=TOKEN; document.getElementById("cfgModal").classList.add("open"); }
+function closeCfg(){ document.getElementById("cfgModal").classList.remove("open"); }
+function saveCfg(){
+  var t=document.getElementById("cfgTok").value.trim();
+  if(!t){alert("Introduce el token");return;}
+  TOKEN=t; localStorage.setItem(SK,TOKEN); closeCfg(); syncAll();
+}
+function gp(p){
+  if(!p) return "";
+  if(p.title&&p.title[0]) return p.title[0].plain_text||"";
+  if(p.rich_text&&p.rich_text[0]) return p.rich_text[0].plain_text||"";
+  if(p.select) return p.select.name||"";
+  if(p.date) return p.date.start||"";
+  if(p.checkbox!==undefined) return p.checkbox;
+  if(p.number!==undefined) return p.number!==null?p.number:"";
+  return "";
+}
+function pp(p){
+  var r=p.properties;
+  var num=gp(r["Nº Pedido"])||gp(r["Num. Pedido"])||gp(r["Name"])||gp(r["Nombre Completo"])||"";
+  return {
+    id:p.id, num:num,
+    confirmado:gp(r["Confirmado"])||false,
+    fecha:gp(r["Fecha Pedido"])||"",
+    cliente:gp(r["Cliente"])||"",
+    alias_cli:gp(r["Alias Cliente"])||"",
+    producto:gp(r["Producto"])||"",
+    contenedores:gp(r["Contenedores"])||"",
+    cantidad:gp(r["Cantidad TN"])||"",
+    proveedor:gp(r["Proveedor"])||"",
+    alias_prov:gp(r["Alias Proveedor"])||"",
+    incoterm:gp(r["Incoterm"])||"",
+    transportista:gp(r["Transportista"])||"",
+    fcarga:gp(r["Fecha Carga"])||"",
+    etd:gp(r["ETD"])||"",
+    eta:gp(r["ETA"])||"",
+    ata:gp(r["ATA"])||"",
+    factura:gp(r["Factura Venta"])||"",
+    estado:gp(r["Estado"])||"",
+    justificante:gp(r["Justificante Entrega"])||false,
+    obs:gp(r["Observaciones"])||"",
+    obs_c:gp(r["Obs Corta"])||"",
+    tt:gp(r["Transit Time (dias)"])||gp(r["Transit Time (días)"])||"",
+    buque:gp(r["Buque"])||"",
+    imo:gp(r["IMO"])||"",
+    cont:gp(r["Contenedor(es)"])||""
+  };
+}
+function pr(p,nf){
+  var r=p.properties;
+  return {id:p.id,nombre:gp(r[nf])||gp(r["Nombre Completo"])||gp(r["Nombre"])||gp(r["Name"])||"",alias:gp(r["Alias"])||"",pais:gp(r["Pais"])||gp(r["País"])||"",tipo:gp(r["Tipo"])||gp(r["Tipo Producto"])||""};
+}
+async function nq(dbId){
+  if(!TOKEN){openCfg();return [];}
+  var body={page_size:100}, results=[], cursor=null, pg=0;
   do {
-    if(cursor) body.start_cursor = cursor;
-    const res = await fetch(`https://api.notion.com/v1/databases/${dbId}/query`, {
-      method:"POST",
-      headers:{ "Authorization":"Bearer "+TOKEN, "Content-Type":"application/json", "Notion-Version":NOTION_VERSION },
-      body: JSON.stringify(body)
-    });
-    if(!res.ok){ setSyncStatus("error","Error Notion "+res.status); return results; }
-    const d = await res.json();
-    results = results.concat(d.results);
-    cursor = d.has_more ? d.next_cursor : null;
-    pages++;
-  } while(cursor && pages < 20);
+    if(cursor) body.start_cursor=cursor;
+    var res=await fetch("https://api.notion.com/v1/databases/"+dbId+"/query",{method:"POST",headers:{"Authorization":"Bearer "+TOKEN,"Content-Type":"application/json","Notion-Version":NV},body:JSON.stringify(body)});
+    if(!res.ok){setSt("error","Error "+res.status);return results;}
+    var d=await res.json();
+    results=results.concat(d.results);
+    cursor=d.has_more?d.next_cursor:null;
+    pg++;
+  } while(cursor&&pg<20);
   return results;
 }
-
-// ── PARSERS ───────────────────────────────────────────────────────────
-function txt(prop){ return prop?.rich_text?.[0]?.plain_text || prop?.title?.[0]?.plain_text || ""; }
-function sel(prop){ return prop?.select?.name || ""; }
-function dat(prop){ return prop?.date?.start || ""; }
-function num(prop){ return prop?.number ?? ""; }
-function chk(prop){ return prop?.checkbox ?? false; }
-function rel(prop){ return prop?.relation?.map(r=>r.id) || []; }
-
-function parsePedido(p){
-  const pr = p.properties;
-  return {
-    id:          p.id,
-    num:         txt(pr["Nº Pedido"]) || txt(pr["Name"]) || txt(pr["Nombre Completo"]),
-    confirmado:  chk(pr["Confirmado"]),
-    fecha:       dat(pr["Fecha Pedido"]),
-    cliente:     txt(pr["Cliente"]),
-    alias_cli:   txt(pr["Alias Cliente"]),
-    producto:    txt(pr["Producto"]),
-    contenedores:num(pr["Contenedores"]),
-    cantidad:    num(pr["Cantidad TN"]),
-    proveedor:   txt(pr["Proveedor"]),
-    alias_prov:  txt(pr["Alias Proveedor"]),
-    incoterm:    txt(pr["Incoterm"]),
-    transportista:txt(pr["Transportista"]),
-    fcarga:      dat(pr["Fecha Carga"]),
-    etd:         dat(pr["ETD"]),
-    eta:         dat(pr["ETA"]),
-    ata:         dat(pr["ATA"]),
-    factura:     txt(pr["Factura Venta"]),
-    estado:      sel(pr["Estado"]) || txt(pr["Estado"]),
-    justificante:chk(pr["Justificante Entrega"]),
-    obs:         txt(pr["Observaciones"]),
-    obs_corta:   txt(pr["Obs Corta"]),
-    transit_time:num(pr["Transit Time (días)"]),
-    buque:       txt(pr["Buque"]),
-    imo:         txt(pr["IMO"]),
-    contenedores_ids: txt(pr["Contenedor(es)"]),
-  };
-}
-
-function parseRef(p, nameField="Nombre Completo"){
-  const pr = p.properties;
-  return {
-    id:     p.id,
-    nombre: txt(pr[nameField]) || txt(pr["Nombre"]) || txt(pr["Name"]),
-    alias:  txt(pr["Alias"]),
-    pais:   txt(pr["País"]),
-    tipo:   txt(pr["Tipo"]) || txt(pr["Tipo Producto"]),
-  };
-}
-
-// ── SYNC ──────────────────────────────────────────────────────────────
 async function syncAll(){
-  if(!TOKEN){ openConfig(); return; }
-  setSyncStatus("loading","Sincronizando...");
+  if(!TOKEN){openCfg();return;}
+  setSt("loading","Sincronizando...");
   try {
-    const [rawPed, rawCli, rawProv, rawTpt] = await Promise.all([
-      notionQuery(DB_IDS.pedidos),
-      notionQuery(DB_IDS.clientes),
-      notionQuery(DB_IDS.proveedores),
-      notionQuery(DB_IDS.transportistas),
-    ]);
-    DATA.pedidos        = rawPed.map(parsePedido).filter(p=>p.num);
-    DATA.clientes       = rawCli.map(p=>parseRef(p));
-    DATA.proveedores    = rawProv.map(p=>parseRef(p));
-    DATA.transportistas = rawTpt.map(p=>parseRef(p,"Nombre"));
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ts:Date.now(), data:DATA}));
-    setSyncStatus("ok","Sincronizado · "+hhmm());
+    var r=await Promise.all([nq(IDS.pedidos),nq(IDS.clientes),nq(IDS.proveedores),nq(IDS.transportistas)]);
+    DB.pedidos=r[0].map(pp).filter(function(p){return p.num;});
+    DB.clientes=r[1].map(function(p){return pr(p,"Nombre Completo");});
+    DB.proveedores=r[2].map(function(p){return pr(p,"Nombre Completo");});
+    DB.transportistas=r[3].map(function(p){return pr(p,"Nombre");});
+    localStorage.setItem(CK,JSON.stringify({ts:Date.now(),data:DB}));
+    setSt("ok","Sincronizado "+ts());
     render();
-  } catch(e){
-    setSyncStatus("error","Error: "+e.message);
-  }
+  } catch(e){ setSt("error",e.message); }
 }
-
 function loadCache(){
   try {
-    const c = JSON.parse(localStorage.getItem(CACHE_KEY)||"{}");
-    if(c.ts && (Date.now()-c.ts) < CACHE_TTL && c.data){
-      DATA = c.data;
-      setSyncStatus("ok","Caché · "+hhmm());
-      return true;
-    }
+    var c=JSON.parse(localStorage.getItem(CK)||"{}");
+    if(c.ts&&(Date.now()-c.ts)<300000&&c.data){DB=c.data;return true;}
   } catch(e){}
   return false;
 }
-
-function hhmm(){ return new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}); }
-
-function setSyncStatus(type, msg){
-  const el = document.getElementById("syncPill");
-  el.className = "sync-pill "+type;
-  document.getElementById("syncMsg").textContent = msg;
+function fd(s){if(!s)return "-";var p=s.split("-");return p.length===3?p[2]+"/"+p[1]+"/"+p[0]:s;}
+function du(s){if(!s)return null;return Math.round((new Date(s)-new Date())/86400000);}
+function chip(st){var m={"IN TRANSIT":["ct","Transito"],"DELIVERED":["cd","Entregado"],"PENDIENTE":["cp","Pendiente"],"CANCELLED":["cc","Cancelado"]};var v=m[st]||["cp",st||"-"];return "<span class='chip "+v[0]+"'>"+v[1]+"</span>";}
+function es(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function st(t){if(!t)return "-";var m={"MOSCA MARITIMO SL":"MOSCA","KORTIMED SRL (KORTIMED)":"KORTIMED","DSV ROAD SPAIN, S.A.U.":"DSV","X-TRACT LOGISTICS S.L.U. (XGL LOGISTICS)":"XGL"};return m[t]||t.split(" ")[0];}
+function tlinks(p){
+  var bl=encodeURIComponent(p.factura||p.num), bq=encodeURIComponent(p.buque||p.num);
+  return "<a class='dplnk msc' href='https://www.msc.com/en/track-a-shipment?agencyPath=msc&bl="+bl+"' target='_blank'>MSC</a> <a class='dplnk wh' href='https://www.wanhai.com/views/cargoTrack/CargoTrack.xhtml?blNo="+bl+"' target='_blank'>Wan Hai</a> <a class='dplnk cma' href='https://www.cma-cgm.com/ebusiness/tracking/search?SearchBy=BL&Reference="+bl+"' target='_blank'>CMA CGM</a> <a class='dplnk vf' href='https://www.vesselfinder.com/vessels?name="+bq+"' target='_blank'>VesselFinder</a> <a class='dplnk mt' href='https://www.marinetraffic.com/en/ais/index/search/all/keyword:"+bq+"' target='_blank'>MarineTraffic</a>";
 }
-
-// ── CONFIG ────────────────────────────────────────────────────────────
-function openConfig(){ document.getElementById("configModal").classList.add("open"); document.getElementById("cfgToken").value=TOKEN; }
-function closeConfig(){ document.getElementById("configModal").classList.remove("open"); }
-function saveConfig(){
-  TOKEN = document.getElementById("cfgToken").value.trim();
-  if(!TOKEN){ alert("Introduce el token"); return; }
-  localStorage.setItem(STORAGE_KEY, TOKEN);
-  closeConfig();
-  syncAll();
+function plinks(p){
+  var bl=encodeURIComponent(p.factura||p.num), bq=encodeURIComponent(p.buque||p.num);
+  return "<a class='plnk msc' href='https://www.msc.com/en/track-a-shipment?agencyPath=msc&bl="+bl+"' target='_blank'>MSC</a><a class='plnk wh' href='https://www.wanhai.com/views/cargoTrack/CargoTrack.xhtml?blNo="+bl+"' target='_blank'>Wan Hai</a><a class='plnk cma' href='https://www.cma-cgm.com/ebusiness/tracking/search?SearchBy=BL&Reference="+bl+"' target='_blank'>CMA CGM</a><a class='plnk vf' href='https://www.vesselfinder.com/vessels?name="+bq+"' target='_blank'>VF</a><a class='plnk mt' href='https://www.marinetraffic.com/en/ais/index/search/all/keyword:"+bq+"' target='_blank'>MT</a>";
 }
-
-// ── UTILS ─────────────────────────────────────────────────────────────
-function fmtDate(s){
-  if(!s) return "—";
-  const [y,m,d] = s.split("-");
-  return d+"/"+m+"/"+y;
-}
-function daysUntil(s){
-  if(!s) return null;
-  return Math.round((new Date(s)-new Date())/86400000);
-}
-function etaDisplay(s, estado){
-  if(!s) return "—";
-  const d = daysUntil(s);
-  const fmt = fmtDate(s);
-  if(estado !== "IN TRANSIT") return fmt;
-  if(d<0)  return `<span class="eta-warn">${fmt} ⚠ vencida</span>`;
-  if(d<=3) return `<span class="eta-hot">${fmt} (${d}d)</span>`;
-  if(d<=7) return `<span class="eta-hot">${fmt} (~${d}d)</span>`;
-  return fmt;
-}
-function chip(st){
-  const m={"IN TRANSIT":["c-transit","🚢 IN TRANSIT"],"DELIVERED":["c-delivered","✅ DELIVERED"],"PENDIENTE":["c-pendiente","⏳ PENDIENTE"],"CANCELLED":["c-cancelled","✕ CANCELLED"]};
-  const [cls,lbl]=m[st]||["c-pendiente",st||"—"];
-  return `<span class="chip ${cls}">${lbl}</span>`;
-}
-function trackLinks(p){
-  const bl=encodeURIComponent(p.factura||p.num);
-  return [
-    `<a class="dp-link msc" href="https://www.msc.com/en/track-a-shipment?agencyPath=msc&bl=${bl}" target="_blank">🔴 MSC</a>`,
-    `<a class="dp-link wanhai" href="https://www.wanhai.com/views/cargoTrack/CargoTrack.xhtml?blNo=${bl}" target="_blank">🔵 Wan Hai</a>`,
-    `<a class="dp-link cma" href="https://www.cma-cgm.com/ebusiness/tracking/search?SearchBy=BL&Reference=${bl}" target="_blank">🔴 CMA CGM</a>`,
-    `<a class="dp-link vf" href="https://www.vesselfinder.com/vessels?name=${encodeURIComponent(p.buque||p.num)}" target="_blank">📡 VesselFinder</a>`,
-    `<a class="dp-link mt" href="https://www.marinetraffic.com/en/ais/index/search/all/keyword:${encodeURIComponent(p.buque||p.num)}" target="_blank">🗺 MarineTraffic</a>`,
-  ].join("");
-}
-function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-function shortTpte(t){
-  if(!t) return "—";
-  const m={"MOSCA MARITIMO SL":"MOSCA","KORTIMED SRL (KORTIMED)":"KORTIMED","DSV ROAD SPAIN, S.A.U.":"DSV","X-TRACT LOGISTICS S.L.U. (XGL LOGISTICS)":"XGL","MSCALIA DESI SHIPPING LINE":"DESI","GRUPO CALICHE, S.L.U. (GRUPO CALICHE)":"CALICHE"};
-  return m[t]||t.split(" ")[0];
-}
-
-// ── FILTER ────────────────────────────────────────────────────────────
-function getFiltered(page){
-  let list = [...DATA.pedidos];
-  if(page==="confirmados")  list=list.filter(p=>p.confirmado && p.estado!=="DELIVERED" && p.estado!=="CANCELLED");
-  else if(page==="sinconfirmar") list=list.filter(p=>!p.confirmado && p.estado!=="DELIVERED" && p.estado!=="CANCELLED");
-  else if(page==="transit") list=list.filter(p=>p.estado==="IN TRANSIT");
-  else if(page==="sindoc")  list=list.filter(p=>p.ata&&!p.justificante&&p.estado!=="CANCELLED");
-  else if(page==="todos")   list=list.filter(p=>p.estado!=="DELIVERED"&&p.estado!=="CANCELLED");
-  if(searchQ){
-    const q=searchQ.toLowerCase();
-    list=list.filter(p=>[p.num,p.cliente,p.alias_cli,p.factura,p.proveedor,p.producto,p.buque,p.obs_corta].some(v=>(v||"").toLowerCase().includes(q)));
-  }
-  list.sort((a,b)=>{let av=a[sortField]||"",bv=b[sortField]||"";return av<bv?-sortDir:av>bv?sortDir:0;});
+function gf(){
+  var list=DB.pedidos.slice();
+  if(PAGE==="confirmados") list=list.filter(function(p){return p.confirmado&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED";});
+  else if(PAGE==="sinconfirmar") list=list.filter(function(p){return !p.confirmado&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED";});
+  else if(PAGE==="transit") list=list.filter(function(p){return p.estado==="IN TRANSIT";});
+  else if(PAGE==="sindoc") list=list.filter(function(p){return p.ata&&!p.justificante&&p.estado!=="CANCELLED";});
+  else if(PAGE==="todos") list=list.filter(function(p){return p.estado!=="DELIVERED"&&p.estado!=="CANCELLED";});
+  if(SQ){var q=SQ.toLowerCase();list=list.filter(function(p){return [p.num,p.cliente,p.alias_cli,p.factura,p.proveedor,p.producto,p.buque,p.obs_c].some(function(v){return (v||"").toLowerCase().indexOf(q)>-1;});});}
+  list.sort(function(a,b){var av=a[SF]||"",bv=b[SF]||"";return av<bv?-SD:av>bv?SD:0;});
   return list;
 }
-
-// ── PAGES ─────────────────────────────────────────────────────────────
+function uc(){
+  var p=DB.pedidos, ac=p.filter(function(x){return x.estado!=="DELIVERED"&&x.estado!=="CANCELLED";});
+  document.getElementById("cnt-todos").textContent=ac.length;
+  document.getElementById("cnt-confirmados").textContent=ac.filter(function(x){return x.confirmado;}).length;
+  document.getElementById("cnt-sinconfirmar").textContent=ac.filter(function(x){return !x.confirmado;}).length;
+  document.getElementById("cnt-transit").textContent=p.filter(function(x){return x.estado==="IN TRANSIT";}).length;
+  document.getElementById("cnt-sindoc").textContent=p.filter(function(x){return x.ata&&!x.justificante&&x.estado!=="CANCELLED";}).length;
+  document.getElementById("cnt-clientes").textContent=DB.clientes.length;
+  document.getElementById("cnt-proveedores").textContent=DB.proveedores.length;
+  document.getElementById("cnt-transportistas").textContent=DB.transportistas.length;
+}
 function showPage(pg){
-  currentPage=pg; pgNum=1; searchQ=""; document.getElementById("searchInput").value="";
-  document.querySelectorAll(".sb-item").forEach(el=>el.classList.remove("active"));
-  document.getElementById("nav-"+pg)?.classList.add("active");
-  const titles={"todos":"Pedidos activos","confirmados":"Confirmados","sinconfirmar":"Sin confirmar","transit":"IN TRANSIT","sindoc":"Sin justificante","reunion":"Vista Reunión Semanal","clientes":"Clientes","proveedores":"Proveedores","transportistas":"Transportistas"};
-  document.getElementById("pageTitle").textContent=titles[pg]||pg;
+  PAGE=pg;PN=1;SQ="";document.getElementById("sInput").value="";
+  document.querySelectorAll(".sb-item").forEach(function(e){e.classList.remove("active");});
+  document.querySelector("[data-pg='"+pg+"']").classList.add("active");
+  var T={"todos":"Pedidos activos","confirmados":"Confirmados","sinconfirmar":"Sin confirmar","transit":"IN TRANSIT","sindoc":"Sin justificante","reunion":"Vista Reunion Semanal","clientes":"Clientes","proveedores":"Proveedores","transportistas":"Transportistas"};
+  document.getElementById("pgTitle").textContent=T[pg]||pg;
   render();
 }
-
 function render(){
-  updateCounts();
-  const el=document.getElementById("content");
-  if(["todos","confirmados","sinconfirmar","transit","sindoc"].includes(currentPage)) el.innerHTML=renderTable();
-  else if(currentPage==="reunion") el.innerHTML=renderMeeting();
-  else el.innerHTML=renderRefPage(currentPage);
+  uc();
+  var el=document.getElementById("content");
+  if(["todos","confirmados","sinconfirmar","transit","sindoc"].indexOf(PAGE)>-1) el.innerHTML=rTbl();
+  else if(PAGE==="reunion") el.innerHTML=rMeeting();
+  else el.innerHTML=rRefs(PAGE);
 }
-
-// ── TABLE VIEW ────────────────────────────────────────────────────────
-function renderTable(){
-  const list=getFiltered(currentPage);
-  const total=list.length;
-  const pages=Math.ceil(total/PG_SIZE)||1;
-  const slice=list.slice((pgNum-1)*PG_SIZE,pgNum*PG_SIZE);
-  if(!total) return `<div class="empty"><div class="ei">📦</div><p>Sin pedidos</p></div>`;
-  const cols=[{f:"num",l:"Nº Pedido"},{f:"fecha",l:"Fecha"},{f:"alias_cli",l:"Cliente"},{f:"alias_prov",l:"Proveedor"},{f:"estado",l:"Estado"},{f:"etd",l:"ETD"},{f:"eta",l:"ETA"},{f:"factura",l:"Factura"},{f:"buque",l:"Buque"},{f:"obs_corta",l:"Obs"}];
-  const thead=cols.map(c=>`<th class="${sortField===c.f?"sorted":""}" onclick="doSort('${c.f}')">${c.l} ${sortField===c.f?(sortDir===1?"↑":"↓"):"↕"}</th>`).join("");
-  const tbody=slice.map(p=>`<tr onclick="openDetail('${p.id}')">
-    <td class="accent">${esc(p.num)}</td>
-    <td class="mono">${fmtDate(p.fecha)}</td>
-    <td>${esc(p.alias_cli||p.cliente||"—")}</td>
-    <td>${esc(p.alias_prov||p.proveedor||"—")}</td>
-    <td>${chip(p.estado)}</td>
-    <td class="mono">${fmtDate(p.etd)}</td>
-    <td class="mono">${p.estado==="IN TRANSIT"?etaDisplay(p.eta,p.estado):fmtDate(p.eta)}</td>
-    <td class="accent">${esc(p.factura||"—")}</td>
-    <td class="mono" style="color:var(--teal2)">${esc(p.buque||"—")}</td>
-    <td class="dim">${esc(p.obs_corta||"")}</td>
-  </tr>`).join("");
-  const pg=pages>1?renderPg(pgNum,pages,total):"";
-  return `<div class="tbl-wrap"><div class="tbl-info"><span>${total} pedidos${searchQ?` — "${searchQ}"`:""}</span><span style="color:var(--text3)">Clic para ver detalle</span></div><div style="overflow-x:auto"><table><thead><tr>${thead}</tr></thead><tbody>${tbody}</tbody></table></div></div>${pg}`;
+function rTbl(){
+  var list=gf(), total=list.length;
+  if(!total) return "<div class='empty'><div style='font-size:40px;opacity:.3;margin-bottom:12px'>📦</div><p>Sin pedidos</p></div>";
+  var pages=Math.ceil(total/PS)||1, sl=list.slice((PN-1)*PS,PN*PS);
+  var cols=[{f:"num",l:"Pedido"},{f:"fecha",l:"Fecha"},{f:"alias_cli",l:"Cliente"},{f:"alias_prov",l:"Proveedor"},{f:"estado",l:"Estado"},{f:"etd",l:"ETD"},{f:"eta",l:"ETA"},{f:"factura",l:"Factura"},{f:"buque",l:"Buque"},{f:"obs_c",l:"Obs"}];
+  var th=cols.map(function(c){return "<th class='"+(SF===c.f?"srt":"")+"' onclick='ds(""+c.f+"")'>"+c.l+" "+(SF===c.f?(SD===1?"↑":"↓"):"↕")+"</th>";}).join("");
+  var tb=sl.map(function(p){var d=du(p.eta),ec="";if(p.estado==="IN TRANSIT"&&d!==null){if(d<0)ec="ov";else if(d<=7)ec="hot";}return "<tr onclick='od(""+p.id+"")'><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fecha)+"</td><td>"+es(p.alias_cli||p.cliente||"-")+"</td><td>"+es(p.alias_prov||p.proveedor||"-")+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='acc'>"+es(p.factura||"-")+"</td><td class='tl'>"+es(p.buque||"-")+"</td><td class='dim'>"+es(p.obs_c||"")+"</td></tr>";}).join("");
+  return "<div class='tbl-wrap'><div class='tbl-info'><span>"+total+" pedidos</span></div><div style='overflow-x:auto'><table><thead><tr>"+th+"</tr></thead><tbody>"+tb+"</tbody></table></div></div>"+(pages>1?rPg(PN,pages,total):"");
 }
-
-function doSort(f){ if(sortField===f)sortDir*=-1; else{sortField=f;sortDir=1;} pgNum=1; render(); }
-function renderPg(cur,total,count){
-  let b=`<button class="pg-btn" onclick="goPage(${cur-1})" ${cur<=1?"disabled":""}>←</button>`;
-  const range=[...new Set([1,Math.max(1,cur-1),cur,Math.min(total,cur+1),total])].sort((a,b)=>a-b);
-  let prev=0;
-  for(const p of range){if(prev&&p-prev>1)b+=`<span class="pg-info">…</span>`;b+=`<button class="pg-btn ${p===cur?"active":""}" onclick="goPage(${p})">${p}</button>`;prev=p;}
-  b+=`<button class="pg-btn" onclick="goPage(${cur+1})" ${cur>=total?"disabled":""}>→</button>`;
-  return `<div class="pagination">${b}<span class="pg-info">${(cur-1)*PG_SIZE+1}–${Math.min(cur*PG_SIZE,count)} de ${count}</span></div>`;
+function ds(f){if(SF===f)SD*=-1;else{SF=f;SD=1;}PN=1;render();}
+function rPg(cur,tot,cnt){
+  var b="<button class='pgb' onclick='gp2("+(cur-1)+")' "+(cur<=1?"disabled":"")+">←</button>";
+  var rng=[1,Math.max(1,cur-1),cur,Math.min(tot,cur+1),tot].filter(function(v,i,a){return a.indexOf(v)===i;}).sort(function(a,b){return a-b;});
+  var prev=0;rng.forEach(function(p){if(prev&&p-prev>1)b+="<span style='color:var(--text3);padding:0 4px'>…</span>";b+="<button class='pgb "+(p===cur?"on":"")+"' onclick='gp2("+p+")'>"+p+"</button>";prev=p;});
+  b+="<button class='pgb' onclick='gp2("+(cur+1)+")' "+(cur>=tot?"disabled":"")+">→</button><span style='font-size:11px;color:var(--text3);margin-left:8px'>"+((cur-1)*PS+1)+"-"+Math.min(cur*PS,cnt)+" de "+cnt+"</span>";
+  return "<div class='pagi'>"+b+"</div>";
 }
-function goPage(p){ pgNum=p; render(); document.getElementById("content").scrollTop=0; }
-
-// ── MEETING VIEW ──────────────────────────────────────────────────────
-function renderMeeting(){
-  const confirmed   = DATA.pedidos.filter(p=>p.confirmado&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED");
-  const unconfirmed = DATA.pedidos.filter(p=>!p.confirmado&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED");
-  const transit     = DATA.pedidos.filter(p=>p.estado==="IN TRANSIT");
-  const sindoc      = DATA.pedidos.filter(p=>p.ata&&!p.justificante&&p.estado!=="CANCELLED");
-  const now = new Date().toLocaleDateString("es-ES",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-  const etaSoon = transit.filter(p=>{const d=daysUntil(p.eta);return d!==null&&d>=0&&d<=7;}).length;
-
-  return `
-  <div class="meeting-banner">
-    <div class="mb-left">
-      <h2>📊 Reunión Semanal — GFB TradeDesk</h2>
-      <div class="mdate">${now}</div>
-    </div>
-    <div class="mb-stats">
-      <div class="mbs"><div class="mn" style="color:var(--accent2)">${confirmed.length}</div><div class="ml">Confirmados</div></div>
-      <div class="mbs"><div class="mn" style="color:var(--amber2)">${unconfirmed.length}</div><div class="ml">Sin confirmar</div></div>
-      <div class="mbs"><div class="mn" style="color:var(--purple2)">${transit.length}</div><div class="ml">In transit</div></div>
-      <div class="mbs"><div class="mn" style="color:var(--amber2)">${etaSoon}</div><div class="ml">ETA ≤7d</div></div>
-      <div class="mbs"><div class="mn" style="color:var(--red2)">${sindoc.length}</div><div class="ml">Sin justif.</div></div>
-    </div>
-  </div>
-
-  <div class="meeting-section">
-    <div class="msec-hdr confirmed">
-      <span class="msec-icon">✅</span>
-      <span class="msec-title">Confirmados — pendientes de embarque</span>
-      <span class="msec-count">${confirmed.length} pedidos</span>
-    </div>
-    <div class="cards">${confirmed.sort((a,b)=>(a.etd||"").localeCompare(b.etd||"")).map(p=>renderCard(p,"confirmed")).join("")||emptyCard()}</div>
-  </div>
-
-  <div class="meeting-section">
-    <div class="msec-hdr unconfirmed">
-      <span class="msec-icon">⏳</span>
-      <span class="msec-title">Sin confirmar</span>
-      <span class="msec-count">${unconfirmed.length} pedidos</span>
-    </div>
-    <div class="cards">${unconfirmed.sort((a,b)=>(a.fecha||"").localeCompare(b.fecha||"")).map(p=>renderCard(p,"unconfirmed")).join("")||emptyCard()}</div>
-  </div>
-
-  <div class="meeting-section">
-    <div class="msec-hdr transit">
-      <span class="msec-icon">🚢</span>
-      <span class="msec-title">IN TRANSIT — seguimiento</span>
-      <span class="msec-count">${transit.length} pedidos</span>
-    </div>
-    <div class="cards">${transit.sort((a,b)=>(a.eta||"").localeCompare(b.eta||"")).map(p=>renderCard(p,"transit")).join("")||emptyCard()}</div>
-  </div>
-
-  ${sindoc.length?`
-  <div class="meeting-section">
-    <div class="msec-hdr sindoc">
-      <span class="msec-icon">📄</span>
-      <span class="msec-title">Pendientes de justificante</span>
-      <span class="msec-count">${sindoc.length} pedidos</span>
-    </div>
-    <div class="cards">${sindoc.map(p=>renderCard(p,"sindoc")).join("")}</div>
-  </div>`:""}`;
+function gp2(p){PN=p;render();document.getElementById("content").scrollTop=0;}
+function rMeeting(){
+  var co=DB.pedidos.filter(function(p){return p.confirmado&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED";});
+  var uc2=DB.pedidos.filter(function(p){return !p.confirmado&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED";});
+  var tr=DB.pedidos.filter(function(p){return p.estado==="IN TRANSIT";});
+  var sd=DB.pedidos.filter(function(p){return p.ata&&!p.justificante&&p.estado!=="CANCELLED";});
+  var nw=new Date().toLocaleDateString("es-ES",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  var es2=tr.filter(function(p){var d=du(p.eta);return d!==null&&d>=0&&d<=7;}).length;
+  co.sort(function(a,b){return (a.etd||"").localeCompare(b.etd||"");});
+  uc2.sort(function(a,b){return (a.fecha||"").localeCompare(b.fecha||"");});
+  tr.sort(function(a,b){return (a.eta||"").localeCompare(b.eta||"");});
+  var ban="<div class='mbanner'><div><h2>Reunion Semanal GFB TradeDesk</h2><div class='mdt'>"+nw+"</div></div><div class='mstats'><div class='mst'><div class='mn' style='color:var(--accent2)'>"+co.length+"</div><div class='ml'>Confirmados</div></div><div class='mst'><div class='mn' style='color:var(--amber2)'>"+uc2.length+"</div><div class='ml'>Sin confirmar</div></div><div class='mst'><div class='mn' style='color:var(--purple2)'>"+tr.length+"</div><div class='ml'>In transit</div></div><div class='mst'><div class='mn' style='color:var(--amber2)'>"+es2+"</div><div class='ml'>ETA 7d</div></div><div class='mst'><div class='mn' style='color:var(--red2)'>"+sd.length+"</div><div class='ml'>Sin justif.</div></div></div></div>";
+  return ban+rSec("conf","✅","Confirmados - pendientes embarque",co,"conf")+rSec("unco","⏳","Sin confirmar",uc2,"pend")+rSec("tran","🚢","IN TRANSIT",tr,"tran")+(sd.length?rSec("sdoc","📄","Pendientes justificante",sd,"sdoc"):"");
 }
-
-function renderCard(p, type){
-  const d = daysUntil(p.eta);
-  let cardCls = type;
-  if(type==="transit"){
-    if(d!==null&&d<0) cardCls="overdue";
-    else if(d!==null&&d<=3) cardCls="urgent";
-    else cardCls="normal";
-  }
-  const etaCls = d!==null&&d<0?"overdue":d!==null&&d<=3?"hot":d!==null&&d<=7?"hot":"";
-  const etaVal = p.eta ? fmtDate(p.eta)+(type==="transit"&&d!==null?` <small style="opacity:.7">(${d}d)</small>`:"") : "—";
-
-  return `<div class="pcard ${cardCls}" onclick="openDetail('${p.id}')">
-    <div class="pc-head">
-      <div class="pc-left">
-        <div class="pc-num">${esc(p.num)} ${p.confirmado?'<span style="color:var(--green2);font-size:9px">●CONF</span>':''}</div>
-        <div class="pc-client">${esc(p.alias_cli||p.cliente||"—")}</div>
-        <div class="pc-product">${esc(p.producto||"—")}</div>
-      </div>
-      ${chip(p.estado)}
-    </div>
-    <div class="pc-meta">
-      <div class="pcm"><div class="pcm-l">Proveedor</div><div class="pcm-v">${esc(p.alias_prov||p.proveedor||"—")}</div></div>
-      <div class="pcm"><div class="pcm-l">ETD</div><div class="pcm-v">${fmtDate(p.etd)}</div></div>
-      <div class="pcm"><div class="pcm-l">ETA</div><div class="pcm-v ${etaCls}">${etaVal}</div></div>
-      <div class="pcm"><div class="pcm-l">Factura</div><div class="pcm-v">${esc(p.factura||"—")}</div></div>
-      <div class="pcm"><div class="pcm-l">Transportista</div><div class="pcm-v">${esc(shortTpte(p.transportista))}</div></div>
-      <div class="pcm"><div class="pcm-l">Incoterm</div><div class="pcm-v">${esc(p.incoterm||"—")}</div></div>
-    </div>
-    ${(p.buque||p.imo||p.contenedores_ids)?`
-    <div class="pc-ship">
-      <div><div class="pcs-l">Buque</div><div class="pcs-v ${p.buque?"":"empty"}">${esc(p.buque||"—")}</div></div>
-      <div><div class="pcs-l">IMO</div><div class="pcs-v ${p.imo?"":"empty"}">${esc(p.imo||"—")}</div></div>
-      <div><div class="pcs-l">Contenedor(es)</div><div class="pcs-v ${p.contenedores_ids?"":"empty"}">${esc(p.contenedores_ids||"—")}</div></div>
-    </div>`:""}
-    ${p.obs_corta?`<div class="pc-obs">${esc(p.obs_corta)}</div>`:""}
-    ${type==="transit"?`<div class="pc-footer">${trackLinks(p)}</div>`:""}
-  </div>`;
+function rSec(cls,ico,ttl,items,type){
+  var cards=items.length?items.map(function(p){return rCard(p,type);}).join(""):"<div style='color:var(--text3);font-size:12px;padding:16px'>Sin pedidos</div>";
+  return "<div class='msec'><div class='msh "+cls+"'><span class='msi'>"+ico+"</span><span class='mst2'>"+ttl+"</span><span class='msc2'>"+items.length+" pedidos</span></div><div class='cards'>"+cards+"</div></div>";
 }
-
-function emptyCard(){ return `<div style="color:var(--text3);font-family:var(--mono);font-size:12px;padding:20px;">Sin pedidos en esta sección</div>`; }
-
-// ── REF PAGES ─────────────────────────────────────────────────────────
-function renderRefPage(type){
-  const items = DATA[type]||[];
-  const q = searchQ.toLowerCase();
-  const filtered = q?items.filter(i=>(i.nombre||"").toLowerCase().includes(q)||(i.alias||"").toLowerCase().includes(q)):items;
-  if(!filtered.length) return `<div class="empty"><div class="ei">🔍</div><p>Sin resultados</p></div>`;
-  const cards = filtered.map(item=>`
-    <div style="background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:border-color .12s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-      <div style="font-size:13px;font-weight:600;margin-bottom:4px;">${esc(item.nombre)}</div>
-      ${item.alias?`<div style="font-family:var(--mono);font-size:11px;color:var(--accent2);">${esc(item.alias)}</div>`:""}
-      ${item.pais?`<div style="font-size:11px;color:var(--text2);margin-top:4px;">🌍 ${esc(item.pais)}</div>`:""}
-      ${item.tipo?`<div style="font-size:11px;color:var(--text2);margin-top:2px;">📦 ${esc(item.tipo)}</div>`:""}
-    </div>`).join("");
-  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">${cards}</div>`;
+function rCard(p,type){
+  var d=du(p.eta),cls=type==="tran"?(d!==null&&d<0?"po":d!==null&&d<=3?"pu":"pt"):type==="conf"?"pc2":type==="pend"?"pp":"ps";
+  var ec=d!==null&&d<0?"ov":d!==null&&d<=3?"hot":"";
+  var ev=p.eta?fd(p.eta)+(type==="tran"&&d!==null?" ("+d+"d)":""):"-";
+  var ship=(p.buque||p.imo||p.cont)?"<div class='pship'><div><div class='psl'>Buque</div><div class='psv "+(p.buque?"":"pse")+"'>"+es(p.buque||"-")+"</div></div><div><div class='psl'>IMO</div><div class='psv "+(p.imo?"":"pse")+"'>"+es(p.imo||"-")+"</div></div><div><div class='psl'>Contenedor</div><div class='psv "+(p.cont?"":"pse")+"'>"+es(p.cont||"-")+"</div></div></div>":"";
+  var obs=p.obs_c?"<div class='pobs'>"+es(p.obs_c)+"</div>":"";
+  var foot=type==="tran"?"<div class='pfoot'>"+plinks(p)+"</div>":"";
+  return "<div class='pcard "+cls+"' onclick='od(""+p.id+"")'><div class='pch'><div><div class='pn'>"+es(p.num)+(p.confirmado?" <small style='color:var(--green2)'>CONF</small>":"")+"</div><div class='pcl'>"+es(p.alias_cli||p.cliente||"-")+"</div><div class='ppr'>"+es(p.producto||"-")+"</div></div>"+chip(p.estado)+"</div><div class='pmeta'><div><div class='pml'>Proveedor</div><div class='pmv'>"+es(p.alias_prov||p.proveedor||"-")+"</div></div><div><div class='pml'>ETD</div><div class='pmv'>"+fd(p.etd)+"</div></div><div><div class='pml'>ETA</div><div class='pmv "+ec+"'>"+ev+"</div></div><div><div class='pml'>Factura</div><div class='pmv'>"+es(p.factura||"-")+"</div></div><div><div class='pml'>Transportista</div><div class='pmv'>"+es(st(p.transportista))+"</div></div><div><div class='pml'>Incoterm</div><div class='pmv'>"+es(p.incoterm||"-")+"</div></div></div>"+ship+obs+foot+"</div>";
 }
-
-// ── DETAIL PANEL ──────────────────────────────────────────────────────
-function openDetail(id){
-  const p = DATA.pedidos.find(x=>x.id===id);
-  if(!p) return;
-  const panel = document.getElementById("dpanel");
-  panel.innerHTML=`
-    <div class="dp-hdr">
-      <div>
-        <div class="dp-num">${esc(p.num)} ${p.confirmado?'<span style="color:var(--green2)">● CONFIRMADO</span>':""}</div>
-        <div class="dp-client">${esc(p.alias_cli||p.cliente||"—")}</div>
-        <div style="margin-top:6px;">${chip(p.estado)}</div>
-      </div>
-      <div class="dp-close" onclick="closeOverlayDirect()">✕</div>
-    </div>
-    <div class="dp-body">
-      <div class="dp-sec">
-        <div class="dp-sec-title">Referencias</div>
-        <div class="dp-grid">
-          <div class="dp-field"><div class="dp-l">Nº Pedido</div><div class="dp-v mono">${esc(p.num)}</div></div>
-          <div class="dp-field"><div class="dp-l">Factura Venta</div><div class="dp-v mono">${esc(p.factura||"—")}</div></div>
-          <div class="dp-field"><div class="dp-l">Fecha Pedido</div><div class="dp-v mono">${fmtDate(p.fecha)}</div></div>
-          <div class="dp-field"><div class="dp-l">Justificante</div><div class="dp-v">${p.justificante?"✅ Recibido":"❌ Pendiente"}</div></div>
-        </div>
-      </div>
-      <div class="dp-sec">
-        <div class="dp-sec-title">Partes</div>
-        <div class="dp-grid">
-          <div class="dp-field"><div class="dp-l">Cliente</div><div class="dp-v">${esc(p.cliente||"—")}</div></div>
-          <div class="dp-field"><div class="dp-l">Proveedor</div><div class="dp-v">${esc(p.proveedor||"—")}</div></div>
-          <div class="dp-field"><div class="dp-l">Transportista</div><div class="dp-v">${esc(p.transportista||"—")}</div></div>
-          <div class="dp-field"><div class="dp-l">Incoterm</div><div class="dp-v mono">${esc(p.incoterm||"—")}</div></div>
-        </div>
-      </div>
-      <div class="dp-sec">
-        <div class="dp-sec-title">Mercancía</div>
-        <div class="dp-grid">
-          <div class="dp-field" style="grid-column:span 2"><div class="dp-l">Producto</div><div class="dp-v">${esc(p.producto||"—")}</div></div>
-          <div class="dp-field"><div class="dp-l">Cantidad (TN)</div><div class="dp-v mono">${p.cantidad||"—"}</div></div>
-          <div class="dp-field"><div class="dp-l">Contenedores</div><div class="dp-v mono">${p.contenedores||"—"}</div></div>
-        </div>
-      </div>
-      <div class="dp-sec">
-        <div class="dp-sec-title">Fechas logísticas</div>
-        <div class="dp-grid">
-          <div class="dp-field"><div class="dp-l">Fecha Carga</div><div class="dp-v mono">${fmtDate(p.fcarga)}</div></div>
-          <div class="dp-field"><div class="dp-l">ETD</div><div class="dp-v mono">${fmtDate(p.etd)}</div></div>
-          <div class="dp-field"><div class="dp-l">ETA</div><div class="dp-v mono">${fmtDate(p.eta)}${p.eta&&p.estado==="IN TRANSIT"?` <small style="color:var(--text3)">(${daysUntil(p.eta)}d)</small>`:""}</div></div>
-          <div class="dp-field"><div class="dp-l">ATA</div><div class="dp-v mono">${fmtDate(p.ata)}</div></div>
-          <div class="dp-field"><div class="dp-l">Transit Time</div><div class="dp-v mono">${p.transit_time?p.transit_time+"d":"—"}</div></div>
-        </div>
-      </div>
-      <div class="dp-sec">
-        <div class="dp-sec-title">🚢 Buque y contenedores</div>
-        <div class="dp-grid">
-          <div class="dp-field"><div class="dp-l">Buque</div><div class="dp-v mono" style="color:var(--teal2)">${esc(p.buque||"—")}</div></div>
-          <div class="dp-field"><div class="dp-l">IMO</div><div class="dp-v mono" style="color:var(--teal2)">${esc(p.imo||"—")}</div></div>
-          <div class="dp-field" style="grid-column:span 2"><div class="dp-l">Contenedor(es)</div><div class="dp-v mono" style="color:var(--teal2)">${esc(p.contenedores_ids||"—")}</div></div>
-        </div>
-      </div>
-      ${p.obs?`<div class="dp-sec"><div class="dp-sec-title">Observaciones</div><div class="dp-v obs">${esc(p.obs)}</div></div>`:""}
-      <div class="dp-sec">
-        <div class="dp-sec-title">Tracking naviera</div>
-        <div class="dp-links">${trackLinks(p)}</div>
-      </div>
-    </div>`;
+function rRefs(type){
+  var items=DB[type]||[], q=SQ.toLowerCase();
+  var fil=q?items.filter(function(i){return (i.nombre||"").toLowerCase().indexOf(q)>-1||(i.alias||"").toLowerCase().indexOf(q)>-1;}):items;
+  if(!fil.length) return "<div class='empty'><div style='font-size:40px;opacity:.3;margin-bottom:12px'>🔍</div><p>Sin resultados</p></div>";
+  return "<div style='display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px'>"+fil.map(function(i){return "<div style='background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 16px'><div style='font-size:13px;font-weight:600;margin-bottom:4px'>"+es(i.nombre)+"</div>"+(i.alias?"<div style='font-size:11px;color:var(--accent2)'>"+es(i.alias)+"</div>":"")+(i.pais?"<div style='font-size:11px;color:var(--text2);margin-top:4px'>"+es(i.pais)+"</div>":"")+(i.tipo?"<div style='font-size:11px;color:var(--text2);margin-top:2px'>"+es(i.tipo)+"</div>":"")+"</div>";}).join("")+"</div>";
+}
+function od(id){
+  var p=DB.pedidos.filter(function(x){return x.id===id;})[0]; if(!p) return;
+  document.getElementById("dpanel").innerHTML="<div class='dph'><div><div class='dpnum'>"+es(p.num)+(p.confirmado?" <span style='color:var(--green2)'>CONFIRMADO</span>":"")+"</div><div class='dpcli'>"+es(p.alias_cli||p.cliente||"-")+"</div><div style='margin-top:6px'>"+chip(p.estado)+"</div></div><div class='dpc' id='dpc'>X</div></div><div class='dpb'><div class='dps'><div class='dpst'>Referencias</div><div class='dpg'><div><div class='dpl'>Pedido</div><div class='dpv'>"+es(p.num)+"</div></div><div><div class='dpl'>Factura</div><div class='dpv'>"+es(p.factura||"-")+"</div></div><div><div class='dpl'>Fecha</div><div class='dpv'>"+fd(p.fecha)+"</div></div><div><div class='dpl'>Justificante</div><div class='dpv'>"+(p.justificante?"Recibido":"Pendiente")+"</div></div></div></div><div class='dps'><div class='dpst'>Partes</div><div class='dpg'><div><div class='dpl'>Cliente</div><div class='dpv'>"+es(p.cliente||"-")+"</div></div><div><div class='dpl'>Proveedor</div><div class='dpv'>"+es(p.proveedor||"-")+"</div></div><div><div class='dpl'>Transportista</div><div class='dpv'>"+es(p.transportista||"-")+"</div></div><div><div class='dpl'>Incoterm</div><div class='dpv'>"+es(p.incoterm||"-")+"</div></div></div></div><div class='dps'><div class='dpst'>Fechas</div><div class='dpg'><div><div class='dpl'>F.Carga</div><div class='dpv'>"+fd(p.fcarga)+"</div></div><div><div class='dpl'>ETD</div><div class='dpv'>"+fd(p.etd)+"</div></div><div><div class='dpl'>ETA</div><div class='dpv'>"+fd(p.eta)+(p.eta&&p.estado==="IN TRANSIT"?" ("+du(p.eta)+"d)":"")+"</div></div><div><div class='dpl'>ATA</div><div class='dpv'>"+fd(p.ata)+"</div></div></div></div><div class='dps'><div class='dpst'>Mercancia</div><div class='dpg'><div style='grid-column:span 2'><div class='dpl'>Producto</div><div class='dpv'>"+es(p.producto||"-")+"</div></div><div><div class='dpl'>TN</div><div class='dpv'>"+es(String(p.cantidad||"-"))+"</div></div><div><div class='dpl'>Contenedores</div><div class='dpv'>"+es(String(p.contenedores||"-"))+"</div></div></div></div><div class='dps'><div class='dpst'>Buque y contenedores</div><div class='dpg'><div><div class='dpl'>Buque</div><div class='dpv' style='color:var(--teal2)'>"+es(p.buque||"-")+"</div></div><div><div class='dpl'>IMO</div><div class='dpv' style='color:var(--teal2)'>"+es(p.imo||"-")+"</div></div><div style='grid-column:span 2'><div class='dpl'>Contenedor(es)</div><div class='dpv' style='color:var(--teal2)'>"+es(p.cont||"-")+"</div></div></div></div>"+(p.obs?"<div class='dps'><div class='dpst'>Observaciones</div><div class='dpv obs'>"+es(p.obs)+"</div></div>":"")+"<div class='dps'><div class='dpst'>Tracking</div><div class='dplnks'>"+tlinks(p)+"</div></div></div>";
+  document.getElementById("dpc").addEventListener("click",cd);
   document.getElementById("overlay").classList.add("open");
 }
-
-function closeOverlay(e){ if(e.target.id==="overlay") closeOverlayDirect(); }
-function closeOverlayDirect(){ document.getElementById("overlay").classList.remove("open"); }
-
-// ── SEARCH / EXPORT ───────────────────────────────────────────────────
-function onSearch(){ searchQ=document.getElementById("searchInput").value.trim(); pgNum=1; render(); }
-
-function exportCSV(){
-  const list = getFiltered(currentPage);
-  const fields=["num","fecha","cliente","proveedor","estado","etd","eta","ata","factura","producto","cantidad","incoterm","transportista","buque","imo","contenedores_ids","obs_corta"];
-  const hdr=["Nº Pedido","Fecha","Cliente","Proveedor","Estado","ETD","ETA","ATA","Factura","Producto","TN","Incoterm","Transportista","Buque","IMO","Contenedores","Obs"];
-  const rows=[hdr,...list.map(p=>fields.map(f=>`"${(p[f]||"").toString().replace(/"/g,'""')}"` ))];
-  const csv=rows.map(r=>r.join(",")).join("
-");
-  const a=document.createElement("a");
-  a.href="data:text/csv;charset=utf-8,﻿"+encodeURIComponent(csv);
-  a.download="gfb_pedidos_"+new Date().toISOString().slice(0,10)+".csv";
-  a.click();
+function cd(){document.getElementById("overlay").classList.remove("open");}
+function expCSV(){
+  var list=gf(), f=["num","fecha","cliente","proveedor","estado","etd","eta","ata","factura","producto","cantidad","incoterm","transportista","buque","imo","cont","obs_c"];
+  var h=["Pedido","Fecha","Cliente","Proveedor","Estado","ETD","ETA","ATA","Factura","Producto","TN","Incoterm","Transportista","Buque","IMO","Contenedores","Obs"];
+  var rows=[h].concat(list.map(function(p){return f.map(function(k){return '"'+String(p[k]||"").replace(/"/g,'""')+'"';});}));
+  var csv=rows.map(function(r){return r.join(",");}).join("\n");
+  var a=document.createElement("a"); a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv); a.download="gfb_"+new Date().toISOString().slice(0,10)+".csv"; a.click();
 }
-
-// ── COUNTS ────────────────────────────────────────────────────────────
-function updateCounts(){
-  const p=DATA.pedidos;
-  const active=p.filter(x=>x.estado!=="DELIVERED"&&x.estado!=="CANCELLED");
-  document.getElementById("cnt-todos").textContent=active.length;
-  document.getElementById("cnt-confirmados").textContent=active.filter(x=>x.confirmado).length;
-  document.getElementById("cnt-sinconfirmar").textContent=active.filter(x=>!x.confirmado).length;
-  document.getElementById("cnt-transit").textContent=p.filter(x=>x.estado==="IN TRANSIT").length;
-  document.getElementById("cnt-sindoc").textContent=p.filter(x=>x.ata&&!x.justificante&&x.estado!=="CANCELLED").length;
-  document.getElementById("cnt-clientes").textContent=DATA.clientes.length;
-  document.getElementById("cnt-proveedores").textContent=DATA.proveedores.length;
-  document.getElementById("cnt-transportistas").textContent=DATA.transportistas.length;
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function(){
-  if(TOKEN){
-    if(loadCache()){ render(); syncAll(); }
-    else syncAll();
-  } else {
-    openConfig();
-    document.getElementById("content").innerHTML='<div class="empty"><div class="ei">🔑</div><p>Introduce tu token de Notion para empezar</p></div>';
-  }
+document.addEventListener("DOMContentLoaded",function(){
+  document.getElementById("btnCfg").addEventListener("click",openCfg);
+  document.getElementById("btnCancel").addEventListener("click",closeCfg);
+  document.getElementById("btnSave").addEventListener("click",saveCfg);
+  document.getElementById("btnExp").addEventListener("click",expCSV);
+  document.getElementById("syncPill").addEventListener("click",syncAll);
+  document.getElementById("overlay").addEventListener("click",function(e){if(e.target.id==="overlay")cd();});
+  document.getElementById("sInput").addEventListener("input",function(){SQ=this.value.trim();PN=1;render();});
+  document.querySelectorAll(".sb-item").forEach(function(el){el.addEventListener("click",function(){showPage(this.dataset.pg);});});
+  if(TOKEN){if(loadCache()){render();syncAll();}else syncAll();}
+  else{openCfg();document.getElementById("content").innerHTML="<div class='empty'><div style='font-size:40px;opacity:.3;margin-bottom:12px'>🔑</div><p>Introduce tu token de Notion para empezar</p></div>";}
 });
 </script>
 </body>
