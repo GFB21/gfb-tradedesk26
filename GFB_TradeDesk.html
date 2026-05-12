@@ -279,7 +279,15 @@ async function nq(dbId){
   var body={page_size:100}, results=[], cursor=null, pg=0;
   do {
     if(cursor) body.start_cursor=cursor;
-    var res=await fetch("https://api.notion.com/v1/databases/"+dbId+"/query",{method:"POST",headers:{"Authorization":"Bearer "+TOKEN,"Content-Type":"application/json","Notion-Version":NV},body:JSON.stringify(body)});
+    var res=await fetch("https://delicate-sun-4d22.aremirez.workers.dev/",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        url:"https://api.notion.com/v1/databases/"+dbId+"/query",
+        token:TOKEN,
+        payload:body
+      })
+    });
     if(!res.ok){setSt("error","Error "+res.status);return results;}
     var d=await res.json();
     results=results.concat(d.results);
