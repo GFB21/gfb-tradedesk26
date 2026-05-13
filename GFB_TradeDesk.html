@@ -239,12 +239,18 @@ function gp(p){
   if(p.number!==undefined) return p.number!==null?p.number:"";
   return "";
 }
+function gpb(p){
+  var v=gp(p);
+  if(v===true||v===false) return v;
+  if(typeof v==="string") return v.toLowerCase()==="sí"||v.toLowerCase()==="si"||v==="true"||v==="1"||v==="yes";
+  return false;
+}
 function pp(p){
   var r=p.properties;
   var num=gp(r["Nº Pedido"])||gp(r["Num. Pedido"])||gp(r["Name"])||gp(r["Nombre Completo"])||"";
   return {
     id:p.id, num:num,
-    confirmado:gp(r["Confirmado"])||false,
+    confirmado:gpb(r["Confirmado"]),
     fecha:gp(r["Fecha Pedido"])||"",
     cliente:gp(r["Cliente"])||"",
     alias_cli:gp(r["Alias Cliente"])||"",
@@ -261,7 +267,7 @@ function pp(p){
     ata:gp(r["ATA"])||"",
     factura:gp(r["Factura Venta"])||"",
     estado:gp(r["Estado"])||"",
-    justificante:gp(r["Justificante Entrega"])||false,
+    justificante:gpb(r["Justificante Entrega"]),
     obs:gp(r["Observaciones"])||"",
     obs_c:gp(r["Obs Corta"])||"",
     tt:gp(r["Transit Time (dias)"])||gp(r["Transit Time (días)"])||"",
