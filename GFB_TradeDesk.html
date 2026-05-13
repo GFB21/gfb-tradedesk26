@@ -348,12 +348,17 @@ function gf(){
   return list;
 }
 function uc(){
-  var p=DB.pedidos, ac=p.filter(function(x){return x.estado!=="DELIVERED"&&x.estado!=="CANCELLED";});
+  var p=DB.pedidos;
+  var ac=p.filter(function(x){return x.estado!=="DELIVERED"&&x.estado!=="CANCELLED";});
+  var conf=ac.filter(function(x){return x.confirmado;});
+  var sinconf=ac.filter(function(x){return !x.confirmado;});
+  var transit=p.filter(function(x){return x.estado==="IN TRANSIT";});
+  var sindoc=p.filter(function(x){return x.ata&&!x.justificante&&x.estado!=="CANCELLED";});
   document.getElementById("cnt-todos").textContent=ac.length;
-  document.getElementById("cnt-confirmados").textContent=ac.filter(function(x){return x.confirmado;}).length;
-  document.getElementById("cnt-sinconfirmar").textContent=ac.filter(function(x){return !x.confirmado;}).length;
-  document.getElementById("cnt-transit").textContent=p.filter(function(x){return x.estado==="IN TRANSIT";}).length;
-  document.getElementById("cnt-sindoc").textContent=p.filter(function(x){return x.ata&&!x.justificante&&x.estado!=="CANCELLED";}).length;
+  document.getElementById("cnt-confirmados").textContent=conf.length;
+  document.getElementById("cnt-sinconfirmar").textContent=sinconf.length;
+  document.getElementById("cnt-transit").textContent=transit.length;
+  document.getElementById("cnt-sindoc").textContent=sindoc.length;
   document.getElementById("cnt-clientes").textContent=DB.clientes.length;
   document.getElementById("cnt-proveedores").textContent=DB.proveedores.length;
   document.getElementById("cnt-transportistas").textContent=DB.transportistas.length;
@@ -392,17 +397,43 @@ function rPg(cur,tot,cnt){
 }
 function gp2(p){PN=p;render();document.getElementById("content").scrollTop=0;}
 function rMeeting(){
-  var co=DB.pedidos.filter(function(p){return p.confirmado&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED";});
-  var uc2=DB.pedidos.filter(function(p){return !p.confirmado&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED";});
+  // Section 1: Confirmed (not yet shipped - no ETD or ETD in future, not IN TRANSIT)
+  var co=DB.pedidos.filter(function(p){
+    return p.confirmado && p.estado!=="DELIVERED" && p.estado!=="CANCELLED" && p.estado!=="IN TRANSIT";
+  });
+  // Section 2: Unconfirmed (pending confirmation, not IN TRANSIT, not delivered)
+  var uc2=DB.pedidos.filter(function(p){
+    return !p.confirmado && p.estado!=="DELIVERED" && p.estado!=="CANCELLED" && p.estado!=="IN TRANSIT";
+  });
+  // Section 3: IN TRANSIT
   var tr=DB.pedidos.filter(function(p){return p.estado==="IN TRANSIT";});
+  // Section 4: Missing justificante (extra)
   var sd=DB.pedidos.filter(function(p){return p.ata&&!p.justificante&&p.estado!=="CANCELLED";});
+
   var nw=new Date().toLocaleDateString("es-ES",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-  var es2=tr.filter(function(p){var d=du(p.eta);return d!==null&&d>=0&&d<=7;}).length;
-  co.sort(function(a,b){return (a.etd||"").localeCompare(b.etd||"");});
-  uc2.sort(function(a,b){return (a.fecha||"").localeCompare(b.fecha||"");});
-  tr.sort(function(a,b){return (a.eta||"").localeCompare(b.eta||"");});
-  var ban="<div class='mbanner'><div><h2>Reunion Semanal GFB TradeDesk</h2><div class='mdt'>"+nw+"</div></div><div class='mstats'><div class='mst'><div class='mn' style='color:var(--accent2)'>"+co.length+"</div><div class='ml'>Confirmados</div></div><div class='mst'><div class='mn' style='color:var(--amber2)'>"+uc2.length+"</div><div class='ml'>Sin confirmar</div></div><div class='mst'><div class='mn' style='color:var(--purple2)'>"+tr.length+"</div><div class='ml'>In transit</div></div><div class='mst'><div class='mn' style='color:var(--amber2)'>"+es2+"</div><div class='ml'>ETA 7d</div></div><div class='mst'><div class='mn' style='color:var(--red2)'>"+sd.length+"</div><div class='ml'>Sin justif.</div></div></div></div>";
-  return ban+rSec("conf","✅","Confirmados - pendientes embarque",co,"conf")+rSec("unco","⏳","Sin confirmar",uc2,"pend")+rSec("tran","🚢","IN TRANSIT",tr,"tran")+(sd.length?rSec("sdoc","📄","Pendientes justificante",sd,"sdoc"):"");
+  var etaSoon=tr.filter(function(p){var d=du(p.eta);return d!==null&&d>=0&&d<=7;}).length;
+  var etaOverdue=tr.filter(function(p){var d=du(p.eta);return d!==null&&d<0;}).length;
+
+  co.sort(function(a,b){return (a.etd||"zzz").localeCompare(b.etd||"zzz");});
+  uc2.sort(function(a,b){return (a.fecha||"zzz").localeCompare(b.fecha||"zzz");});
+  tr.sort(function(a,b){return (a.eta||"zzz").localeCompare(b.eta||"zzz");});
+
+  var ban="<div class='mbanner'>"
+    +"<div><h2>Reunion Semanal — GFB TradeDesk</h2><div class='mdt'>"+nw+"</div></div>"
+    +"<div class='mstats'>"
+    +"<div class='mst'><div class='mn' style='color:var(--accent2)'>"+co.length+"</div><div class='ml'>Confirmados</div></div>"
+    +"<div class='mst'><div class='mn' style='color:var(--amber2)'>"+uc2.length+"</div><div class='ml'>Sin confirmar</div></div>"
+    +"<div class='mst'><div class='mn' style='color:var(--purple2)'>"+tr.length+"</div><div class='ml'>In transit</div></div>"
+    +"<div class='mst'><div class='mn' style='color:var(--amber2)'>"+etaSoon+"</div><div class='ml'>ETA ≤7 dias</div></div>"
+    +"<div class='mst'><div class='mn' style='color:var(--red2)'>"+etaOverdue+"</div><div class='ml'>ETA vencida</div></div>"
+    +"<div class='mst'><div class='mn' style='color:var(--red2)'>"+sd.length+"</div><div class='ml'>Sin justif.</div></div>"
+    +"</div></div>";
+
+  return ban
+    +rSec("conf","✅","Pedidos Confirmados — pendientes de embarque",co,"conf")
+    +rSec("unco","⏳","Pedidos Pendientes de Confirmar",uc2,"pend")
+    +rSec("tran","🚢","IN TRANSIT — seguimiento",tr,"tran")
+    +(sd.length?rSec("sdoc","📄","Sin Justificante de Entrega",sd,"sdoc"):"");
 }
 function rSec(cls,ico,ttl,items,type){
   var cards=items.length?items.map(function(p){return rCard(p,type);}).join(""):"<div style='color:var(--text3);font-size:12px;padding:16px'>Sin pedidos</div>";
