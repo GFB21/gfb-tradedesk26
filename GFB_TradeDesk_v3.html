@@ -358,33 +358,42 @@ async function syncAll(){
     if(NOTION_TOKEN){
       setSt("loading","Cargando datos logisticos...");
       try {
-        var nData = await nFetch(NOTION_DB);
-        if(nData && nData.results){
-          nData.results.forEach(function(p){
-            var r=p.properties;
-            var num=ng(r["Nº Pedido"])||ng(r["Nombre Completo"])||ng(r["Name"])||"";
-            if(num) notionMap[num.toUpperCase()] = {
-              id:           p.id,
-              confirmado_n: ngs(r["Confirmado"])==="Sí",
-              factura_n:    ng(r["Factura Venta"])||"",
-              estado_n:     ngs(r["Estado"])||"",
-              modalidad:    ngs(r["MODALIDAD"])||"",
-              forwarder:    ng(r["FORWARDER"])||"",
-              naviera:      ngs(r["NAVIERA"])||"",
-              booking:      ng(r["BOOKING"])||"",
-              buque:        ng(r["BUQUE"])||"",
-              imo:          ng(r["IMO"])||"",
-              equipo:       ngs(r["EQUIPO"])||"",
-              cont:         ng(r["Nº CONTENEDOR"])||"",
-              matricula:    ng(r["MATRICULA"])||"",
-              etd:          ng(r["ETD"])||"",
-              eta:          ng(r["ETA"])||"",
-              ata:          ng(r["ATA"])||"",
-              fcarga:       ng(r["Fecha Carga"])||"",
-              justif:       ngs(r["Justificante Entrega"])==="Sí",
-              obs:          ng(r["Observaciones"])||""
-            };
-          });
+        // Paginación Notion — carga todos los registros
+        var nCursor = null;
+        var nTotal = 0;
+        do {
+          var nPayload = {page_size:100};
+          if(nCursor) nPayload.start_cursor = nCursor;
+          var nData = await nFetch(NOTION_DB, nPayload);
+          if(nData && nData.results){
+            nData.results.forEach(function(p){
+              var r=p.properties;
+              var num=ng(r["Nº Pedido"])||ng(r["Nombre Completo"])||ng(r["Name"])||"";
+              if(num) notionMap[num.toUpperCase()] = {
+                id:           p.id,
+                confirmado_n: ngs(r["Confirmado"])==="Sí",
+                factura_n:    ngrt(r["Factura Venta"])||"",
+                modalidad:    ngs(r["MODALIDAD"])||"",
+                forwarder:    ngrt(r["FORWARDER"])||"",
+                naviera:      ngs(r["NAVIERA"])||"",
+                booking:      ngrt(r["BOOKING"])||"",
+                buque:        ngrt(r["BUQUE"])||"",
+                imo:          ngrt(r["IMO"])||"",
+                equipo:       ngs(r["EQUIPO"])||"",
+                cont:         ngrt(r["Nº CONTENEDOR"])||"",
+                matricula:    ngrt(r["MATRICULA"])||"",
+                etd:          ngdt(r["ETD"])||"",
+                eta:          ngdt(r["ETA"])||"",
+                ata:          ngdt(r["ATA"])||"",
+                fcarga:       ngdt(r["Fecha Carga"])||"",
+                justif:       ngs(r["Justificante Entrega"])==="Sí",
+                obs:          ngrt(r["Observaciones"])||""
+              };
+              nTotal++;
+            });
+            nCursor = nData.has_more ? nData.next_cursor : null;
+          } else { nCursor = null; }
+        } while(nCursor);
           document.getElementById("srcNotion").textContent = "Notion "+Object.keys(notionMap).length;
           document.getElementById("srcNotion").style.color = "var(--green2)";
         }
@@ -508,6 +517,8 @@ function chip(st){
   return "<span class='chip "+v[0]+"'>"+v[1]+"</span>";
 }
 function ngs(p){if(!p)return "";if(p.type==="select")return p.select?p.select.name:"";if(p.type==="checkbox")return p.checkbox?"Sí":"No";return "";}
+function ngrt(p){if(!p)return "";if(p.type==="rich_text"&&p.rich_text&&p.rich_text.length)return p.rich_text[0].plain_text||"";if(p.type==="title"&&p.title&&p.title.length)return p.title[0].plain_text||"";return "";}
+function ngdt(p){if(!p)return "";if(p.type==="date"&&p.date)return p.date.start||"";return "";}
 function es(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function shortT(t){if(!t)return "-";var m={"MOSCA MARITIMO SL":"MOSCA","KORTIMED SRL (KORTIMED)":"KORTIMED","DSV ROAD SPAIN, S.A.U.":"DSV","X-TRACT LOGISTICS S.L.U. (XGL LOGISTICS)":"XGL"};return m[t]||t.split(" ")[0];}
 function fmtMoney(n,cur){if(!n)return "-";return Number(n).toLocaleString("es-ES",{minimumFractionDigits:0,maximumFractionDigits:0})+" "+(cur||"EUR").toUpperCase();}
