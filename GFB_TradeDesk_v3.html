@@ -394,9 +394,8 @@ async function syncAll(){
             nCursor = nData.has_more ? nData.next_cursor : null;
           } else { nCursor = null; }
         } while(nCursor);
-          document.getElementById("srcNotion").textContent = "Notion "+Object.keys(notionMap).length;
-          document.getElementById("srcNotion").style.color = "var(--green2)";
-        }
+        document.getElementById("srcNotion").textContent = "Notion "+Object.keys(notionMap).length;
+        document.getElementById("srcNotion").style.color = "var(--green2)";
       } catch(ne){
         document.getElementById("srcNotion").textContent = "Notion (sin token)";
       }
