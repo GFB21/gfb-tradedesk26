@@ -72,6 +72,7 @@ td.ov{color:var(--red2);font-weight:600;}
 .cp{background:rgba(210,153,34,.15);color:var(--amber2);}
 .cc{background:rgba(72,79,88,.3);color:var(--text3);}
 .cs{background:rgba(248,81,73,.15);color:var(--red2);}
+.ca{background:rgba(47,129,247,.15);color:var(--accent2);}
 .mbanner{background:linear-gradient(135deg,rgba(138,87,229,.12),rgba(47,129,247,.08));border:1px solid rgba(138,87,229,.25);border-radius:10px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
 .mbanner h2{font-size:20px;font-weight:800;}
 .mbanner .mdt{font-size:11px;color:var(--text2);margin-top:4px;}
@@ -411,17 +412,17 @@ async function syncAll(){
 
       // Holded status: 0=draft/pending, 1=confirmed, 2=closed/delivered
       var holdedStatus = so.status;
-      var estado_n = nl.estado_n || "";
       var confirmado = nl.confirmado_n !== undefined ? nl.confirmado_n : (holdedStatus===1||holdedStatus===2);
       var factura_n = nl.factura_n || "";
       var ata_v = nl.ata || "";
+      var etd_v = nl.etd || "";
       var justif_v = nl.justif || false;
       var estado;
-      if(estado_n==="Terminado"||( ata_v && justif_v)) estado="DELIVERED";
-      else if(estado_n==="Sin justificante"||(ata_v && !justif_v)) estado="SIN DOC";
-      else if(estado_n==="En curso"||(factura_n && !ata_v)) estado="IN TRANSIT";
-      else if(estado_n==="Confirmado"||(confirmado && !factura_n)) estado="CONFIRMADO";
-      else estado="PENDIENTE";
+      if(ata_v && factura_n && justif_v)          estado="COMPLETADO";
+      else if(ata_v && !justif_v)                 estado="SIN DOC";
+      else if(factura_n && etd_v)                 estado="IN TRANSIT";
+      else if(confirmado && !factura_n)            estado="CONFIRMADO";
+      else                                         estado="PENDIENTE";
 
       // Get product name (first product)
       var producto = "";
@@ -502,7 +503,7 @@ function loadCache(){
 function fd(s){if(!s)return "-";var p=s.split("-");return p.length===3?p[2]+"/"+p[1]+"/"+p[0]:s;}
 function du(s){if(!s)return null;return Math.round((new Date(s)-new Date())/86400000);}
 function chip(st){
-  var m={"IN TRANSIT":["ct","En tránsito"],"DELIVERED":["cd","Terminado"],"CONFIRMADO":["cd","Confirmado"],"PENDIENTE":["cp","Sin confirmar"],"SIN DOC":["cs","Sin justificante"],"CANCELLED":["cc","Cancelado"]};
+  var m={"IN TRANSIT":["ct","En tránsito"],"COMPLETADO":["cd","Completado"],"CONFIRMADO":["ca","Confirmado"],"PENDIENTE":["cp","Sin confirmar"],"SIN DOC":["cs","Sin justificante"],"CANCELLED":["cc","Cancelado"]};
   var v=m[st]||["cp",st||"-"];
   return "<span class='chip "+v[0]+"'>"+v[1]+"</span>";
 }
@@ -523,12 +524,12 @@ function tlinks(p){
 // ── FILTER ────────────────────────────────────────────────────────────
 function gf(){
   var list=DB.ops.slice();
-  if(PAGE==="activos")       list=list.filter(function(p){return p.estado!=="DELIVERED"&&p.estado!=="CANCELLED";});
+  if(PAGE==="activos")       list=list.filter(function(p){return p.estado!=="COMPLETADO"&&p.estado!=="CANCELLED";});
   else if(PAGE==="confirmados")   list=list.filter(function(p){return p.estado==="CONFIRMADO";});
   else if(PAGE==="sinconfirmar")  list=list.filter(function(p){return p.estado==="PENDIENTE";});
   else if(PAGE==="transit")       list=list.filter(function(p){return p.estado==="IN TRANSIT";});
   else if(PAGE==="sindoc")        list=list.filter(function(p){return p.estado==="SIN DOC";});
-  else if(PAGE==="terminados")    list=list.filter(function(p){return p.estado==="DELIVERED";});
+  else if(PAGE==="terminados")    list=list.filter(function(p){return p.estado==="COMPLETADO";});
   if(SQ){
     var q=SQ.toLowerCase();
     list=list.filter(function(p){
@@ -541,14 +542,14 @@ function gf(){
 
 function uc(){
   var p=DB.ops;
-  var ac=p.filter(function(x){return x.estado!=="DELIVERED"&&x.estado!=="CANCELLED";});
+  var ac=p.filter(function(x){return x.estado!=="COMPLETADO"&&x.estado!=="CANCELLED";});
   document.getElementById("cnt-todos").textContent=p.length;
   document.getElementById("cnt-activos").textContent=ac.length;
   document.getElementById("cnt-confirmados").textContent=p.filter(function(x){return x.estado==="CONFIRMADO";}).length;
   document.getElementById("cnt-sinconfirmar").textContent=p.filter(function(x){return x.estado==="PENDIENTE";}).length;
   document.getElementById("cnt-transit").textContent=p.filter(function(x){return x.estado==="IN TRANSIT";}).length;
   document.getElementById("cnt-sindoc").textContent=p.filter(function(x){return x.estado==="SIN DOC";}).length;
-  document.getElementById("cnt-terminados").textContent=p.filter(function(x){return x.estado==="DELIVERED";}).length;
+  document.getElementById("cnt-terminados").textContent=p.filter(function(x){return x.estado==="COMPLETADO";}).length;
   document.getElementById("cnt-clientes").textContent=Object.keys(DB.clients).length;
   document.getElementById("cnt-proveedores").textContent=Object.keys(DB.providers).length;
 }
@@ -558,7 +559,7 @@ function showPage(pg){
   document.querySelectorAll(".sb-item").forEach(function(e){e.classList.remove("active");});
   var nav=document.querySelector("[data-pg='"+pg+"']");
   if(nav) nav.classList.add("active");
-  var T={"activos":"Pedidos activos","confirmados":"Confirmados","sinconfirmar":"Sin confirmar","transit":"IN TRANSIT","sindoc":"Sin justificante","terminados":"Terminados","todos":"Todos los pedidos","reunion":"Vista Reunion Semanal","clientes":"Clientes","proveedores":"Proveedores"};
+  var T={"activos":"Pedidos activos","confirmados":"Confirmados","sinconfirmar":"Sin confirmar","transit":"IN TRANSIT","sindoc":"Sin justificante","terminados":"Completados","todos":"Todos los pedidos","reunion":"Vista Reunion Semanal","clientes":"Clientes","proveedores":"Proveedores"};
   document.getElementById("pgTitle").textContent=T[pg]||pg;
   render();
 }
