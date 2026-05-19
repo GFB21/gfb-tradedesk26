@@ -354,21 +354,20 @@ async function syncAll(){
     });
 
     // 4. Load Notion logistics data (if token available)
-    var notionMap = {};
+    window.notionMap = {};
+    var notionMap = window.notionMap;
     if(NOTION_TOKEN){
       setSt("loading","Cargando datos logisticos...");
       try {
-        // Paginación Notion — carga todos los registros
-        var nCursor = null;
-        var nTotal = 0;
-        do {
+        // Función que carga todas las páginas de Notion recursivamente
+        async function loadAllNotion(cursor){
           var nPayload = {page_size:100};
-          if(nCursor) nPayload.start_cursor = nCursor;
+          if(cursor) nPayload.start_cursor = cursor;
           var nData = await nFetch(NOTION_DB, nPayload);
           if(nData && nData.results){
             nData.results.forEach(function(p){
               var r=p.properties;
-              var num=ng(r["Nº Pedido"])||ng(r["Nombre Completo"])||ng(r["Name"])||"";
+              var num=ngrt(r["Nº Pedido"])||ng(r["Nombre Completo"])||ng(r["Name"])||"";
               if(num) notionMap[num.toUpperCase()] = {
                 id:           p.id,
                 confirmado_n: ngs(r["Confirmado"])==="Sí",
@@ -389,14 +388,17 @@ async function syncAll(){
                 justif:       ngs(r["Justificante Entrega"])==="Sí",
                 obs:          ngrt(r["Observaciones"])||""
               };
-              nTotal++;
             });
-            nCursor = nData.has_more ? nData.next_cursor : null;
-          } else { nCursor = null; }
-        } while(nCursor);
+            if(nData.has_more && nData.next_cursor){
+              await loadAllNotion(nData.next_cursor);
+            }
+          }
+        }
+        await loadAllNotion(null);
         document.getElementById("srcNotion").textContent = "Notion "+Object.keys(notionMap).length;
         document.getElementById("srcNotion").style.color = "var(--green2)";
       } catch(ne){
+        console.error("Notion error:", ne);
         document.getElementById("srcNotion").textContent = "Notion (sin token)";
       }
     }
@@ -420,7 +422,8 @@ async function syncAll(){
 
       // Holded status: 0=draft/pending, 1=confirmed, 2=closed/delivered
       var holdedStatus = so.status;
-      var confirmado = nl.confirmado_n !== undefined ? nl.confirmado_n : (holdedStatus===1||holdedStatus===2);
+      var enNotion = Object.keys(nl).length > 0;
+      var confirmado = enNotion ? nl.confirmado_n : false;
       var factura_n = nl.factura_n || "";
       var ata_v = nl.ata || "";
       var etd_v = nl.etd || "";
