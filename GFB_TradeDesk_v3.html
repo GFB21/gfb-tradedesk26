@@ -238,6 +238,7 @@ var SK_P = "gfb_proxy_url";
 var CK   = "gfb_cache_v3";
 
 var DB = { ops:[], clients:{}, providers:{} };
+var notionMap = {};
 var PAGE = "activos", SQ = "", SF = "num", SD = 1, PN = 1, PS = 50;
 
 function ts(){ return new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}); }
@@ -354,8 +355,7 @@ async function syncAll(){
     });
 
     // 4. Load Notion logistics data (if token available)
-    window.notionMap = {};
-    var notionMap = window.notionMap;
+    notionMap = {};
     if(NOTION_TOKEN){
       setSt("loading","Cargando datos logisticos...");
       try {
@@ -591,12 +591,12 @@ function rTbl(){
   var list=gf(), total=list.length;
   if(!list.length) return "<div class='empty'><div style='font-size:40px;opacity:.3;margin-bottom:12px'>📦</div><p>Sin pedidos</p></div>";
   var pages=Math.ceil(total/PS)||1, sl=list.slice((PN-1)*PS,PN*PS);
-  var cols=[{f:"num",l:"Operacion"},{f:"fecha",l:"Fecha"},{f:"cliente",l:"Cliente"},{f:"proveedor",l:"Proveedor"},{f:"estado",l:"Estado"},{f:"etd",l:"ETD"},{f:"eta",l:"ETA"},{f:"producto",l:"Producto"},{f:"buque",l:"Buque"},{f:"transportista",l:"Transportista"}];
+  var cols=[{f:"num",l:"Operacion"},{f:"fecha",l:"Fecha"},{f:"cliente",l:"Cliente"},{f:"proveedor",l:"Proveedor"},{f:"estado",l:"Estado"},{f:"etd",l:"ETD"},{f:"eta",l:"ETA"},{f:"producto",l:"Producto"},{f:"factura",l:"Factura"},{f:"transportista",l:"Transportista"}];
   var th=cols.map(function(c){return "<th class='"+(SF===c.f?"srt":"")+"' onclick='ds(this)' data-f='"+c.f+"'>"+c.l+" "+(SF===c.f?(SD===1?"↑":"↓"):"↕")+"</th>";}).join("");
   var tb=sl.map(function(p){
     var d=du(p.eta), ec="";
     if(p.estado==="IN TRANSIT"&&d!==null){if(d<0)ec="ov";else if(d<=7)ec="hot";}
-    return "<tr data-oid='"+p.id+"'><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fecha)+"</td><td>"+es(p.cliente||"-")+"</td><td>"+es(shortN(p.proveedor))+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='dim'>"+es(shortN(p.producto))+"</td><td class='tl'>"+es(p.buque||"-")+"</td><td class='dim'>"+es(shortT(p.transportista))+"</td></tr>";
+    return "<tr data-oid='"+p.id+"'><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fecha)+"</td><td>"+es(p.cliente||"-")+"</td><td>"+es(shortN(p.proveedor))+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='dim'>"+es(shortN(p.producto))+"</td><td class='tl'>"+es(p.factura||"-")+"</td><td class='dim'>"+es(shortT(p.transportista))+"</td></tr>";
   }).join("");
   return "<div class='tbl-wrap'><div class='tbl-info'><span>"+total+" operaciones</span><span style='color:var(--text3)'>Clic para ver detalle</span></div><div style='overflow-x:auto'><table><thead><tr>"+th+"</tr></thead><tbody>"+tb+"</tbody></table></div></div>"+(pages>1?rPg(PN,pages,total):"");
 }
