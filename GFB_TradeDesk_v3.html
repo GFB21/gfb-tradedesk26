@@ -596,7 +596,7 @@ function rTbl(){
   var tb=sl.map(function(p){
     var d=du(p.eta), ec="";
     if(p.estado==="IN TRANSIT"&&d!==null){if(d<0)ec="ov";else if(d<=7)ec="hot";}
-    return "<tr data-oid='"+p.id+"'><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fecha)+"</td><td>"+es(p.cliente||"-")+"</td><td>"+es(shortN(p.proveedor))+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='dim'>"+es(shortN(p.producto))+"</td><td class='tl'>"+es(p.factura||"-")+"</td><td class='dim'>"+es(shortT(p.transportista))+"</td></tr>";
+    return "<tr data-oid='"+p.id+"'><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fecha)+"</td><td>"+es(p.cliente||"-")+"</td><td>"+es(shortN(p.proveedor))+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='dim'>"+es(shortN(p.producto))+"</td><td class='tl'>"+es(p.factura_n||"-")+"</td><td class='dim'>"+es(shortT(p.transportista))+"</td></tr>";
   }).join("");
   return "<div class='tbl-wrap'><div class='tbl-info'><span>"+total+" operaciones</span><span style='color:var(--text3)'>Clic para ver detalle</span></div><div style='overflow-x:auto'><table><thead><tr>"+th+"</tr></thead><tbody>"+tb+"</tbody></table></div></div>"+(pages>1?rPg(PN,pages,total):"");
 }
