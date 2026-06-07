@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>GFB — Márgenes 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f11;--surface:#16181c;--surface2:#1e2026;--border:#2a2d35;--border2:#353840;--text:#e8eaf0;--muted:#6b7280;--muted2:#9ca3af;--green:#4ade80;--green2:#22c55e;--red:#f87171;--amber:#fbbf24;--amber2:#d97706;--font:'Bricolage Grotesque',sans-serif;--mono:'JetBrains Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+header{padding:14px 24px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:100}
+.logo{font-size:16px;font-weight:700}.logo span{color:var(--green)}
+.hright{display:flex;gap:8px;margin-left:auto;align-items:center;flex-wrap:wrap}
+.tinp{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 12px;color:var(--text);font-family:var(--mono);font-size:11px;outline:none;width:220px}
+.btn{background:var(--green2);color:#000;border:none;border-radius:8px;padding:8px 18px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn:hover{background:var(--green)}.btn:disabled{background:var(--border2);color:var(--muted);cursor:not-allowed}
+.sstrip{border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto}
+.sstrip-i{display:flex}
+.sc{padding:13px 22px;border-right:1px solid var(--border);min-width:130px;flex-shrink:0}
+.sc:last-child{border-right:none}
+.sl{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.sv{font-family:var(--mono);font-size:17px;font-weight:700}
+.sv.g{color:var(--green)}.sv.r{color:var(--red)}.sv.a{color:var(--amber)}.sv.w{color:var(--text)}
+.ss{font-size:11px;color:var(--muted);margin-top:1px}
+.ctrls{padding:10px 24px;gap:8px;align-items:center;border-bottom:1px solid var(--border);flex-wrap:wrap;background:var(--bg);display:flex}
+.fi{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:220px}
+.fs{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;cursor:pointer}
+.ct{font-size:11px;color:var(--muted);margin-left:auto;font-family:var(--mono)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:1300px}
+thead th{padding:9px 12px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--border2);background:var(--surface);white-space:nowrap;position:sticky;top:53px;z-index:10}
+thead th.r{text-align:right}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:var(--surface2)}
+tbody tr.wr{background:rgba(251,191,36,0.04)}
+tbody tr.wr:hover{background:rgba(251,191,36,0.09)}
+tbody td{padding:10px 12px;vertical-align:middle;white-space:nowrap}
+td.r{text-align:right;font-family:var(--mono);font-size:11px}
+td.ped{font-family:var(--mono);font-size:11px;font-weight:600}
+td.cli{font-size:12px;color:var(--muted2);max-width:140px;overflow:hidden;text-overflow:ellipsis}
+td.pro{font-size:11px;color:var(--muted2);max-width:160px;overflow:hidden;text-overflow:ellipsis}
+td.inc{font-family:var(--mono);font-size:11px;color:var(--muted2)}
+td.dt{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.vp{color:var(--green)}.vn{color:var(--red)}.vw{color:var(--amber);font-weight:600}.vm{color:var(--muted)}
+.pp{display:inline-block;padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:10px;font-weight:600}
+.pp.g{background:rgba(74,222,128,0.12);color:var(--green)}.pp.r{background:rgba(248,113,113,0.12);color:var(--red)}.pp.a{background:rgba(251,191,36,0.12);color:var(--amber)}
+.wb{display:inline-flex;align-items:center;gap:3px;background:rgba(251,191,36,0.15);color:var(--amber);border-radius:4px;padding:2px 6px;font-size:10px;font-weight:600}
+.ob{display:inline-flex;align-items:center;gap:3px;background:rgba(74,222,128,0.1);color:var(--green);border-radius:4px;padding:2px 6px;font-size:10px}
+.state{text-align:center;padding:80px 20px;color:var(--muted)}
+.ico{font-size:48px;margin-bottom:14px;opacity:.4}
+.lb{width:280px;height:3px;background:var(--border);border-radius:99px;overflow:hidden;margin:18px auto 0}
+.lbi{height:100%;background:var(--green2);border-radius:99px;animation:lp 1.2s ease-in-out infinite}
+@keyframes lp{0%{width:0;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0;margin-left:100%}}
+tfoot td{padding:11px 12px;border-top:2px solid var(--border2);font-weight:700;background:var(--surface);position:sticky;bottom:0}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">GFB <span>TradeDesk</span> · Márgenes 2026</div>
+  <div class="hright">
+    <input class="tinp" id="hToken" type="password" placeholder="Token Holded">
+    <button class="btn" id="btnLoad" onclick="loadAll()">⚡ Cargar operaciones</button>
+  </div>
+</header>
+
+<div id="sstrip" class="sstrip" style="display:none">
+  <div class="sstrip-i">
+    <div class="sc"><div class="sl">Operaciones</div><div class="sv w" id="sTotal">—</div></div>
+    <div class="sc"><div class="sl">Facturación</div><div class="sv w" id="sVenta">—</div></div>
+    <div class="sc"><div class="sl">M. Bruto</div><div class="sv g" id="sBruto">—</div><div class="ss" id="sBrP">—</div></div>
+    <div class="sc"><div class="sl">M. Neto</div><div class="sv g" id="sNeto">—</div><div class="ss" id="sNeP">—</div></div>
+    <div class="sc"><div class="sl">⚠ Sin comisión</div><div class="sv a" id="sWarn">—</div><div class="ss">revisar</div></div>
+  </div>
+</div>
+
+<div id="ctrls" class="ctrls" style="display:none">
+  <input class="fi" id="fTxt" type="text" placeholder="Buscar pedido, cliente, producto..." oninput="applyF()">
+  <select class="fs" id="fComm" onchange="applyF()">
+    <option value="">Todas</option>
+    <option value="ok">Con comisión</option>
+    <option value="warn">⚠ Sin comisión</option>
+  </select>
+  <select class="fs" id="fSort" onchange="applyF()">
+    <option value="date_desc">Más reciente</option>
+    <option value="date_asc">Más antigua</option>
+    <option value="neto_desc">Mayor margen neto</option>
+    <option value="neto_asc">Menor margen neto</option>
+    <option value="pct_desc">Mayor % neto</option>
+    <option value="venta_desc">Mayor venta</option>
+  </select>
+  <span class="ct" id="cTag"></span>
+</div>
+
+<div id="main">
+  <div class="state">
+    <div class="ico">📊</div>
+    <p>Introduce el token de Holded y carga las operaciones</p>
+    <p style="margin-top:8px;font-size:13px;color:var(--muted)">Márgenes completos · Una fila por SO · Comisiones del Excel cruzadas automáticamente</p>
+  </div>
+</div>
+
+<script>
+var PROXY = "https://delicate-sun-4d22.aremirez.workers.dev/";
+var HOLDED_KEY = "";
+var SK_H = "gfb_holded_key";
+
+// ── TOKEN PERSISTENCE (igual que QUIQUITO) ────────────────────────────
+function loadCfg() {
+  HOLDED_KEY = localStorage.getItem(SK_H) || "";
+  if (HOLDED_KEY) document.getElementById("hToken").value = HOLDED_KEY;
+}
+function saveCfg(key) {
+  if (key) localStorage.setItem(SK_H, key);
+}
+
+// ── HOLDED API (igual que QUIQUITO) ───────────────────────────────────
+async function hFetch(endpoint) {
+  var res = await fetch(PROXY, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({service:"holded", url:"https://api.holded.com/api/"+endpoint, token:HOLDED_KEY})
+  });
+  if (!res.ok) throw new Error("Holded HTTP " + res.status);
+  return await res.json();
+}
+
+async function hFetchAll(endpoint) {
+  var all = [], page = 1, hasMore = true;
+  while (hasMore && page <= 20) {
+    var data = await hFetch(endpoint + "?page=" + page + "&limit=50");
+    if (!Array.isArray(data) || data.length === 0) { hasMore = false; break; }
+    all = all.concat(data);
+    if (data.length < 50) hasMore = false;
+    page++;
+  }
+  return all;
+}
+
+// ── COMMISSION DATA ───────────────────────────────────────────────────
+var CD = {"GFB230076": {"commission": 277.75, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB230077": {"commission": 1452, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB230079": {"commission": 1949.0625, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB230081": {"commission": 495, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB230082": {"commission": 852.5, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB230080": {"commission": 871.1999999999998, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB230087": {"commission": 643.5, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB230088": {"commission": 10890, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240096": {"commission": 917.5, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240101": {"commission": 1949.0625, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240104": {"commission": 269.22500000000014, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240105": {"commission": 115.5, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240106": {"commission": 89.375, "emisor": "LABOR BASICA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240121": {"commission": 162.5, "emisor": "EARTH MIND", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240122": {"commission": 444.9999999999998, "emisor": "EARTH MIND", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240123": {"commission": 9375, "emisor": "EARTH MIND", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240126": {"commission": 2252.5, "emisor": "EARTH MIND", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240118": {"commission": 3300, "emisor": "EARTH MIND", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240135": {"commission": 8580, "emisor": "EARTH MIND", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240120": {"commission": 2370, "emisor": "EARTH MIND", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240145": {"commission": 1845, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240149": {"commission": 1325, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240152": {"commission": 1320, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240155": {"commission": 4200, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240159": {"commission": 9900, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240162": {"commission": 9900, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240165": {"commission": 1140, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240168": {"commission": 2169.999999999999, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240169": {"commission": 390, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240182": {"commission": 1792.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240186": {"commission": 1325, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240194": {"commission": 481.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240199": {"commission": 196, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240201": {"commission": 293.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240216": {"commission": 1325, "emisor": "MACAN ASIA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240224": {"commission": 1792.5, "emisor": "MACAN ASIA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240226": {"commission": 775, "emisor": "MACAN ASIA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240227": {"commission": 12100, "emisor": "MACAN ASIA", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240228": {"commission": 1000, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240261": {"commission": 9075, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240265": {"commission": 3025, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240269": {"commission": 132.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240278": {"commission": 75, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240283": {"commission": 1926, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240286": {"commission": 1325, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240289": {"commission": 675, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240308": {"commission": 154.99999999999994, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240332": {"commission": 1580, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240336": {"commission": 170, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240340": {"commission": 1550, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB240341": {"commission": 177.4999999999999, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250355": {"commission": 42, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250356": {"commission": 266.9999999999999, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250361": {"commission": 102, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250362": {"commission": 265, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250363": {"commission": 775, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250366": {"commission": 309.9999999999999, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250371": {"commission": 927.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250372": {"commission": 0, "emisor": "", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250387": {"commission": 92.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250391": {"commission": 617.0999999999999, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250392": {"commission": 1580, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250395": {"commission": 1239.9999999999995, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250396": {"commission": 578, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250397": {"commission": 1802.8999999999996, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250399": {"commission": 200, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250402": {"commission": 265, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250407": {"commission": 265, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250409": {"commission": 1580, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250418": {"commission": 1239.9999999999995, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250419": {"commission": 265, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250420": {"commission": 3630, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250423": {"commission": 10.75, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250424": {"commission": 619.9999999999998, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250428": {"commission": 200, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250429": {"commission": 265, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250430": {"commission": 619.9999999999998, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250436": {"commission": 200, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250437": {"commission": 790, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250438": {"commission": 8.4, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250439": {"commission": 111.24999999999994, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250441": {"commission": 75, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250444": {"commission": 4888.4000000000015, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250447": {"commission": 90, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250453": {"commission": 2662.499999999998, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250454": {"commission": 556.5999999999999, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250456": {"commission": 2057, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250457": {"commission": 790, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250461": {"commission": 3025, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250462": {"commission": 2662.499999999998, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250467": {"commission": 397.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250472": {"commission": 968, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250475": {"commission": 48.400000000000006, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250476": {"commission": 2420, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250477": {"commission": 98, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250478": {"commission": 42, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250479": {"commission": 111.24999999999994, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250480": {"commission": 684, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250481": {"commission": 930, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250482": {"commission": 790, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250485": {"commission": 397.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250491": {"commission": 1234.1999999999998, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250492": {"commission": 2468.3999999999996, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250501": {"commission": 2662.499999999998, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250504": {"commission": 200, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250505": {"commission": 200, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250508": {"commission": 265, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250509": {"commission": 3630, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250520": {"commission": 1580, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250521": {"commission": 2662.499999999998, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250523": {"commission": 619.9999999999998, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250527": {"commission": 3702.5999999999985, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250532": {"commission": 68.425, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250533": {"commission": 117.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250536": {"commission": 397.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250537": {"commission": 1239.9999999999995, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250538": {"commission": 4961, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250539": {"commission": 790, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250540": {"commission": 200, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250541": {"commission": 1580, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250548": {"commission": 178, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250551": {"commission": 4525.4000000000015, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250552": {"commission": 1580, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250553": {"commission": 1550, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250562": {"commission": 400, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250563": {"commission": 790, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250564": {"commission": 265, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250573": {"commission": 2765, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250577": {"commission": 1860, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250581": {"commission": 207.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250582": {"commission": 206.99999999999997, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250583": {"commission": 257.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250602": {"commission": 397.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250611": {"commission": 600, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250613": {"commission": 5135, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250614": {"commission": 4815.799999999999, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250618": {"commission": 465.0, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250622": {"commission": 1239.9999999999995, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250623": {"commission": 397.5, "emisor": "BER NATURE", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250645": {"commission": 4936.799999999999, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250650": {"commission": 1185, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250662": {"commission": 4936.799999999999, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250664": {"commission": 3555, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250674": {"commission": 4345, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250675": {"commission": 146.75, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250681": {"commission": 4936.799999999999, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250682": {"commission": 3950, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250686": {"commission": 98, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250694": {"commission": 4936.799999999999, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250697": {"commission": 84.99999999999997, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250698": {"commission": 75, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250699": {"commission": 7900, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250705": {"commission": 3702.5999999999985, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250706": {"commission": 112.5, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250719": {"commission": 4936.799999999999, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250725": {"commission": 309.9999999999999, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB250726": {"commission": 930, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260736": {"commission": 3950, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260740": {"commission": 132.5, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260747": {"commission": 397.5, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260768": {"commission": 40.925, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260774": {"commission": 98, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260776": {"commission": 146.75, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260779": {"commission": 62.5, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260781": {"commission": 1524.6999999999996, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260788": {"commission": 62.5, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260789": {"commission": 3702.5999999999985, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260795": {"commission": 265, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260815": {"commission": 243, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260829": {"commission": 930, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260835": {"commission": 449.5, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260847": {"commission": 930, "emisor": "ROWLAB INGREDIENTS", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260869": {"commission": 3702.5999999999985, "emisor": "", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260874": {"commission": 311.5, "emisor": "", "status": "Cobrado", "sheet": "AROMAS"}, "GFB260887": {"commission": 178, "emisor": "", "status": "PENDIENTE", "sheet": "AROMAS"}, "GFB260894": {"commission": 200, "emisor": "", "status": "PENDIENTE", "sheet": "AROMAS"}, "GFB260895": {"commission": 89, "emisor": "", "status": "PENDIENTE", "sheet": "AROMAS"}, "GFB260905": {"commission": 103.99999999999997, "emisor": "", "status": "PENDIENTE", "sheet": "AROMAS"}, "GFB260915": {"commission": 311.5, "emisor": "", "status": "PENDIENTE", "sheet": "AROMAS"}, "GFB260917": {"commission": 930, "emisor": "", "status": "PENDIENTE", "sheet": "AROMAS"}, "GFB260928": {"commission": 200, "emisor": "", "status": "PENDIENTE", "sheet": "AROMAS"}, "GFB260929": {"commission": 112.5, "emisor": "", "status": "PENDIENTE", "sheet": "AROMAS"}, "GFB260934": {"commission": 3476.2000000000007, "emisor": "", "status": "PENDIENTE DE COBRAR", "sheet": "MIXCO 26"}, "GFB230085": {"commission": 248.09400000000096, "emisor": "LABOR BASICA", "status": "COBRADO", "sheet": "MIXCO"}, "GFB230089": {"commission": 1743, "emisor": "LABOR BASICA", "status": "COBRADO", "sheet": "MIXCO"}, "GFB230091": {"commission": 502.79999999999995, "emisor": "LABOR BASICA", "status": "COBRADO", "sheet": "MIXCO"}, "GFB230092": {"commission": 248.29199999999946, "emisor": "LABOR BASICA", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240098": {"commission": 496.79999999999995, "emisor": "LABOR BASICA", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240097": {"commission": 233.0460000000005, "emisor": "LABOR BASICA", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240100": {"commission": 1761.1999999999998, "emisor": "LABOR BASICA", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240099": {"commission": 247.5, "emisor": "LABOR BASICA", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240115": {"commission": 2043.869999999998, "emisor": "EARTH-MIND", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240128": {"commission": 2978.1150000000016, "emisor": "EARTH-MIND", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240130": {"commission": 362.8639999999991, "emisor": "EARTH-MIND", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240138": {"commission": 606.6450000000018, "emisor": "EARTH-MIND", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240153": {"commission": 3301.8439999999982, "emisor": "EARTH-MIND", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240163": {"commission": 1650.9220000000012, "emisor": "EARTH-MIND", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240171": {"commission": 1696.7600000000002, "emisor": "EARTH-MIND", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240175": {"commission": 1690.4849999999997, "emisor": "EARTH-MIND", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240180": {"commission": 684.9300000000073, "emisor": "EARTH-MIND", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240181": {"commission": 72.50399999999786, "emisor": "EARTH-MIND", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240205": {"commission": 1681.6999999999998, "emisor": "EARTH-MIND", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240239": {"commission": 143.73600000000147, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240245": {"commission": 1682.955, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240251": {"commission": 1686.72, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240253": {"commission": 1695.5049999999999, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240259": {"commission": 346.28999999999996, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240260": {"commission": 345.52499999999986, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240262": {"commission": 71.12600000000111, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240263": {"commission": 72.7160000000008, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240309": {"commission": 268.40000000000146, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240322": {"commission": 1852.2000000000007, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250354": {"commission": 1928.64, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250367": {"commission": 1382.7699999999998, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250374": {"commission": 1960.980000000001, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250381": {"commission": 3905.7900000000013, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250383": {"commission": 1475.649999999999, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250389": {"commission": 1479.5000000000007, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250398": {"commission": 749.6499999999985, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250404": {"commission": 745.2500000000014, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250416": {"commission": 751.3000000000018, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250422": {"commission": 1955.1000000000022, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250425": {"commission": 739.1999999999994, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250432": {"commission": 749.6499999999985, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250433": {"commission": 1993.3200000000018, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250434": {"commission": 736.4499999999996, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250440": {"commission": 737.0000000000007, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250442": {"commission": 1999.2000000000007, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250445": {"commission": 739.7499999999984, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250449": {"commission": 1991.8500000000022, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250458": {"commission": 737.0000000000007, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250465": {"commission": 744.1500000000012, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250483": {"commission": 728.1999999999989, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250484": {"commission": 743.6000000000001, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250486": {"commission": 1997.730000000001, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250495": {"commission": 741.3999999999996, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250496": {"commission": 721.6000000000013, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250507": {"commission": 1987.4399999999994, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250513": {"commission": 1981.5600000000004, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250528": {"commission": 742.5, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250529": {"commission": 733.149999999999, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250542": {"commission": 743.0500000000011, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250549": {"commission": 730.9499999999987, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250550": {"commission": 747.9999999999991, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250558": {"commission": 735.8999999999985, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250559": {"commission": 744.6999999999987, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250560": {"commission": 732.6000000000015, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250565": {"commission": 740.8499999999985, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250566": {"commission": 732.6000000000015, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250575": {"commission": 724.9000000000001, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250576": {"commission": 739.1999999999994, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250587": {"commission": 726.5500000000011, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250592": {"commission": 732.6000000000015, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250594": {"commission": 2010.9599999999982, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250598": {"commission": 748.5500000000002, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250609": {"commission": 734.8000000000002, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250619": {"commission": 732.0500000000004, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250624": {"commission": 737.5500000000018, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250628": {"commission": 1946.2800000000002, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250631": {"commission": 732.6000000000015, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250633": {"commission": 735.3500000000013, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250634": {"commission": 739.7499999999984, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250635": {"commission": 732.6000000000015, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250639": {"commission": 759.9200000000017, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250642": {"commission": 1969.7999999999993, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250641": {"commission": 762.1600000000021, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250660": {"commission": 753.1999999999985, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250661": {"commission": 757.6799999999994, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250663": {"commission": 752.6400000000012, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250666": {"commission": 757.1200000000001, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250667": {"commission": 752.6400000000012, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250668": {"commission": 760.4799999999989, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250669": {"commission": 758.8000000000013, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250670": {"commission": 755.4400000000005, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250671": {"commission": 751.5200000000009, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250676": {"commission": 1965.39, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250693": {"commission": 757.6799999999994, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250696": {"commission": 762.7199999999993, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250700": {"commission": 672.5600000000011, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250701": {"commission": 757.6799999999994, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB250718": {"commission": 1988.909999999999, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADO", "sheet": "MIXCO"}, "GFB240119": {"commission": 2148.938, "emisor": "COMERCIAL EUROPEA DEL SURESTE", "status": "COBRADO", "sheet": "CHI"}, "GFB240170": {"commission": 25787.255999999998, "emisor": "COMERCIAL EUROPEA DEL SURESTE", "status": "COBRADO", "sheet": "CHI"}, "GFB240257": {"commission": 8395.2, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CHI"}, "GFB240273": {"commission": 10494, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CHI"}, "GFB240274": {"commission": 53539.2, "emisor": "EARTH MIND", "status": "COBRADO", "sheet": "CHI"}, "GFB240290": {"commission": 18889.2, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CHI"}, "GFB240304": {"commission": 10296, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CHI"}, "GFB240305": {"commission": 14414.4, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CHI"}, "GFB250378": {"commission": 23086.8, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CHI"}, "GFB250595": {"commission": 6296.4, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CHI"}, "GFB260793": {"commission": 1561.5474999999997, "emisor": "ROWLAB INGREDIENTS", "status": "2026-03-23 00:00:00", "sheet": "LPZ"}, "GFB260794": {"commission": 1561.7025000000003, "emisor": "ROWLAB INGREDIENTS", "status": "2026-03-23 00:00:00", "sheet": "LPZ"}, "GFB260797": {"commission": 1562.0125000000003, "emisor": "ROWLAB INGREDIENTS", "status": "2026-03-23 00:00:00", "sheet": "LPZ"}, "GFB260881": {"commission": 1167.9250000000006, "emisor": "", "status": "2026-05-30 00:00:00", "sheet": "LPZ"}, "GFB260908": {"commission": 2106.2950000000014, "emisor": "", "status": "2026-05-31 00:00:00", "sheet": "LPZ"}, "GFB240276": {"commission": 1715, "emisor": "BER NATURE", "status": "COBRADA", "sheet": "CZARNIKOW"}, "GFB250351": {"commission": 1748.6000000000001, "emisor": "BER NATURE", "status": "COBRADA", "sheet": "CZARNIKOW"}, "GFB250547": {"commission": 1698.2, "emisor": "BER NATURE", "status": "COBRADA", "sheet": "CZARNIKOW"}, "GFB260748": {"commission": 1743, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADA", "sheet": "CZARNIKOW"}, "GFB260856": {"commission": 1820, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADA", "sheet": "CZARNIKOW"}, "GFB260799": {"commission": 960, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADA", "sheet": "RUSIA"}, "GFB260802": {"commission": 820, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADA", "sheet": "RUSIA"}, "GFB260850": {"commission": 960, "emisor": "ROWLAB INGREDIENTS", "status": "COBRADA", "sheet": "RUSIA"}, "GFB260854": {"commission": 954, "emisor": "", "status": "PENDIENTE DE COBRAR", "sheet": "SOFAVINC"}, "GFB240124": {"commission": 1200, "emisor": "COMERCIAL EUROPEA DEL SURESTE", "status": "COBRADO", "sheet": "CLEMENTINE"}, "GFB240139": {"commission": 1260, "emisor": "COMERCIAL EUROPEA DEL SURESTE", "status": "COBRADO", "sheet": "CLEMENTINE"}, "GFB240197": {"commission": 1260, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CLEMENTINE"}, "GFB240212": {"commission": 1260, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CLEMENTINE"}, "GFB240221": {"commission": 1260, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CLEMENTINE"}, "GFB240230": {"commission": 1260, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CLEMENTINE"}, "GFB240272": {"commission": 1260, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CLEMENTINE"}, "GFB240296": {"commission": 1305, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "CLEMENTINE"}, "GFB250365": {"commission": 570, "emisor": "BER NATURE", "status": "COBRADO", "sheet": "KAKI"}, "GFB240117": {"commission": 1976.0000000000002, "emisor": "COMERCIAL EUROPEA DEL SURESTE", "status": "COBRADO", "sheet": "NARANJA"}, "GFB240136": {"commission": 2080, "emisor": "COMERCIAL EUROPEA DEL SURESTE", "status": "COBRADO", "sheet": "NARANJA"}};
+
+function findComm(docNum) {
+  var n = (docNum || "").toUpperCase().replace(/^[A-Z]+/, "");
+  if (!n) return null;
+  var keys = Object.keys(CD);
+  for (var i = 0; i < keys.length; i++) {
+    if (keys[i].indexOf(n) !== -1) return CD[keys[i]];
+  }
+  return null;
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+function eur(n) {
+  if (n == null) return "—";
+  return new Intl.NumberFormat("es-ES", {style:"currency", currency:"EUR", minimumFractionDigits:0, maximumFractionDigits:0}).format(n);
+}
+function eur2(n) {
+  if (n == null) return "—";
+  return new Intl.NumberFormat("es-ES", {minimumFractionDigits:2, maximumFractionDigits:2}).format(n) + " €";
+}
+function pct(n) { return n == null ? "—" : (n >= 0 ? "+" : "") + n.toFixed(1) + "%"; }
+function fmtD(ts) { return ts ? new Date(ts*1000).toLocaleDateString("es-ES", {day:"2-digit", month:"2-digit", year:"2-digit"}) : "—"; }
+function gT(doc) {
+  if (!doc) return 0;
+  return doc.total != null ? doc.total : (doc.subtotal != null ? doc.subtotal : (doc.amount != null ? doc.amount : 0));
+}
+function pp(n) {
+  if (n == null) return '<span class="vm">—</span>';
+  var c = n >= 15 ? "g" : n >= 5 ? "a" : "r";
+  return '<span class="pp ' + c + '">' + pct(n) + '</span>';
+}
+function volCell(mN, vol, unit) {
+  if (!vol || vol <= 0) return '<span class="vm">—</span>';
+  var v = mN / vol;
+  return '<span class="' + (v >= 0 ? "vp" : "vn") + '">' + eur2(v) + '/' + unit + '</span>';
+}
+function prog(msg, isErr) {
+  document.getElementById("main").innerHTML =
+    '<div class="state"><div class="ico">' + (isErr ? "⚠️" : "⚙️") + '</div>' +
+    '<p style="color:' + (isErr ? "var(--red)" : "var(--text)") + '">' + msg + '</p>' +
+    (isErr ? "" : '<div class="lb"><div class="lbi"></div></div>') +
+    '</div>';
+}
+
+var rows = [];
+
+// ── LOAD ALL (patrón exacto de QUIQUITO) ──────────────────────────────
+async function loadAll() {
+  HOLDED_KEY = document.getElementById("hToken").value.trim();
+  if (!HOLDED_KEY) { alert("Introduce el token de Holded"); return; }
+  saveCfg(HOLDED_KEY);
+
+  var btn = document.getElementById("btnLoad");
+  btn.disabled = true; btn.textContent = "Cargando...";
+  document.getElementById("sstrip").style.display = "none";
+  document.getElementById("ctrls").style.display = "none";
+
+  try {
+    prog("Cargando pedidos de venta (SO)...");
+    var soList = await hFetchAll("invoicing/v1/documents/salesorder");
+
+    prog("Cargando pedidos de compra (PO) — sin filtro de fecha...");
+    var poList = await hFetchAll("invoicing/v1/documents/purchaseorder");
+
+    prog("Construyendo mapa de costes...");
+
+    // ── BUILD poMap exactamente igual que QUIQUITO ────────────────────
+    // poMap[numericPart][prefix] = doc
+    var poMap = {};
+    poList.forEach(function(po) {
+      var num = (po.docNumber || "").toUpperCase();
+      var numericPart = num.replace(/^[A-Z]+/, "");
+      if (!numericPart) return;
+      if (!poMap[numericPart]) poMap[numericPart] = {};
+      var prefix = num.replace(/[0-9].*/, "");
+      poMap[numericPart][prefix] = po;
+    });
+
+    prog("Calculando márgenes...");
+
+    // ── ONE ROW PER SO, igual que QUIQUITO ────────────────────────────
+    rows = soList.map(function(so) {
+      var soNum = (so.docNumber || "").toUpperCase();
+      var numericPart = soNum.replace(/^[A-Z]+/, "");
+      var poEntry = poMap[numericPart] || {};
+      var po  = poEntry["PO"] || null;
+      var toD = poEntry["TO"] || null;
+      var co  = poEntry["CO"] || null;
+
+      var venta = gT(so);
+      var tPO   = gT(po);
+      var tTO   = gT(toD);
+      var tCO   = gT(co);
+
+      // Otros prefijos (OC, etc.)
+      var tOther = 0;
+      Object.keys(poEntry).forEach(function(pfx) {
+        if (pfx !== "SO" && pfx !== "PO" && pfx !== "TO" && pfx !== "CO") tOther += gT(poEntry[pfx]);
+      });
+
+      var comm  = findComm(soNum);
+      var tComm = comm ? comm.commission : 0;
+      var mB    = venta - tPO;
+      var mN    = mB - tTO - tCO - tComm - tOther;
+      var pB    = venta ? (mB / venta) * 100 : null;
+      var pN    = venta ? (mN / venta) * 100 : null;
+
+      // Producto e incoterm — igual que QUIQUITO
+      var producto = "";
+      if (so.products && so.products[0]) producto = so.products[0].name || "";
+
+      var incoterm = "";
+      if (so.customFields) so.customFields.forEach(function(cf) {
+        if (cf.field && cf.field.toUpperCase() === "INCOTERM") incoterm = cf.value || "";
+      });
+
+      // Volumen desde líneas
+      var volKg = 0, volTon = 0;
+      if (so.lines) so.lines.forEach(function(l) {
+        var u = (l.unit || l.units || "").toString().toLowerCase().trim();
+        var qty = parseFloat(l.quantity || l.qty || 0) || 0;
+        if (u === "ton" || u === "t" || u === "mt" || u === "tn" || u === "tonnes" || u === "tonelada" || u === "toneladas") volTon += qty;
+        else if (u === "kg" || u === "kgs" || u === "kilogram" || u === "kilograms" || u === "kilos") volKg += qty;
+      });
+
+      return {
+        soNum: soNum, numericPart: numericPart,
+        client: so.contactName || so.name || "",
+        producto: producto, incoterm: incoterm,
+        date: so.date || so.createdAt || 0,
+        venta: venta, tPO: tPO, tTO: tTO, tCO: tCO, tComm: tComm, tOther: tOther,
+        mB: mB, mN: mN, pB: pB, pN: pN,
+        hasC: !!comm, hasPO: !!po,
+        volKg: volKg, volTon: volTon
+      };
+    }).filter(function(r) { return r.venta > 0; });
+
+    btn.textContent = "↺ Recargar"; btn.disabled = false;
+    document.getElementById("sstrip").style.display = "block";
+    document.getElementById("ctrls").style.display = "flex";
+    updSum();
+    applyF();
+
+  } catch(err) {
+    btn.disabled = false; btn.textContent = "⚡ Cargar operaciones";
+    prog("Error: " + err.message, true);
+    console.error(err);
+  }
+}
+
+function updSum() {
+  var tV=0, tB=0, tN=0, w=0;
+  rows.forEach(function(r) { tV += r.venta; tB += r.mB; tN += r.mN; if (!r.hasC) w++; });
+  document.getElementById("sTotal").textContent = rows.length;
+  document.getElementById("sVenta").textContent = eur(tV);
+  document.getElementById("sBruto").textContent = eur(tB);
+  document.getElementById("sBruto").className = "sv " + (tB >= 0 ? "g" : "r");
+  document.getElementById("sBrP").textContent = pct(tV ? (tB/tV)*100 : null) + " s/venta";
+  document.getElementById("sNeto").textContent = eur(tN);
+  document.getElementById("sNeto").className = "sv " + (tN >= 0 ? "g" : "r");
+  document.getElementById("sNeP").textContent = pct(tV ? (tN/tV)*100 : null) + " s/venta";
+  document.getElementById("sWarn").textContent = w;
+}
+
+function applyF() {
+  var txt = document.getElementById("fTxt").value.toLowerCase();
+  var cf  = document.getElementById("fComm").value;
+  var sf  = document.getElementById("fSort").value;
+  var r   = rows.slice();
+  if (txt) r = r.filter(function(x) {
+    return (x.soNum||"").toLowerCase().indexOf(txt) !== -1 ||
+           (x.client||"").toLowerCase().indexOf(txt) !== -1 ||
+           (x.producto||"").toLowerCase().indexOf(txt) !== -1;
+  });
+  if (cf === "ok")   r = r.filter(function(x) { return x.hasC; });
+  if (cf === "warn") r = r.filter(function(x) { return !x.hasC; });
+  r.sort(function(a, b) {
+    if (sf === "date_asc")   return (a.date||0) - (b.date||0);
+    if (sf === "neto_desc")  return b.mN - a.mN;
+    if (sf === "neto_asc")   return a.mN - b.mN;
+    if (sf === "pct_desc")   return (b.pN != null ? b.pN : -999) - (a.pN != null ? a.pN : -999);
+    if (sf === "venta_desc") return b.venta - a.venta;
+    return (b.date||0) - (a.date||0);
+  });
+  document.getElementById("cTag").textContent = r.length + " de " + rows.length + " operaciones";
+  renderT(r);
+}
+
+function renderT(r) {
+  if (!r.length) {
+    document.getElementById("main").innerHTML = '<div class="state"><div class="ico">🔍</div><p>Sin resultados</p></div>';
+    return;
+  }
+
+  var tV=0, tPO=0, tTO=0, tCO=0, tComm=0, tB=0, tN=0;
+  r.forEach(function(x) { tV+=x.venta; tPO+=x.tPO; tTO+=x.tTO; tCO+=x.tCO; tComm+=x.tComm; tB+=x.mB; tN+=x.mN; });
+  var pB = tV ? (tB/tV)*100 : 0;
+  var pN = tV ? (tN/tV)*100 : 0;
+
+  var html = '<div class="tw"><table>';
+
+  // THEAD
+  html += '<thead><tr>';
+  html += '<th>Fecha</th>';
+  html += '<th>Pedido</th>';
+  html += '<th>Cliente</th>';
+  html += '<th>Producto</th>';
+  html += '<th>INC</th>';
+  html += '<th class="r">Venta</th>';
+  html += '<th class="r">Coste PO</th>';
+  html += '<th class="r">M.Bruto €</th>';
+  html += '<th class="r">MB%</th>';
+  html += '<th class="r">Transp.</th>';
+  html += '<th class="r">Colab.</th>';
+  html += '<th class="r">Comisión</th>';
+  html += '<th class="r">M.Neto €</th>';
+  html += '<th class="r">MN%</th>';
+  html += '<th class="r">€/Ton</th>';
+  html += '<th class="r">€/Kg</th>';
+  html += '</tr></thead>';
+
+  // TBODY
+  html += '<tbody>';
+  r.forEach(function(x) {
+    var w = !x.hasC;
+    var commCell = w
+      ? '<span class="wb">⚠ sin dato</span>'
+      : '<span class="ob">✓ ' + eur(x.tComm) + '</span>';
+    var netoCell = w
+      ? '<span class="vw">' + eur(x.mN) + '</span><br><span style="font-size:9px;color:var(--amber2)">confirmar comisión</span>'
+      : '<span class="' + (x.mN >= 0 ? "vp" : "vn") + '">' + eur(x.mN) + '</span>';
+    var pnCell = w
+      ? '<span class="pp a">' + pct(x.pN) + ' ⚠</span>'
+      : pp(x.pN);
+    var poCell = x.tPO > 0
+      ? '<span class="vn">-' + eur(x.tPO) + '</span>'
+      : '<span class="vm">—' + (x.hasPO ? "" : " (sin PO)") + '</span>';
+
+    html += '<tr class="' + (w ? "wr" : "") + '">';
+    html += '<td class="dt">' + fmtD(x.date) + '</td>';
+    html += '<td class="ped">' + x.soNum + '</td>';
+    html += '<td class="cli" title="' + x.client + '">' + (x.client || "—") + '</td>';
+    html += '<td class="pro" title="' + x.producto + '">' + (x.producto || "—") + '</td>';
+    html += '<td class="inc">' + (x.incoterm || "—") + '</td>';
+    html += '<td class="r">' + eur(x.venta) + '</td>';
+    html += '<td class="r">' + poCell + '</td>';
+    html += '<td class="r ' + (x.mB >= 0 ? "vp" : "vn") + '">' + eur(x.mB) + '</td>';
+    html += '<td class="r">' + pp(x.pB) + '</td>';
+    html += '<td class="r vn">' + (x.tTO > 0 ? '-' + eur(x.tTO) : '<span class="vm">—</span>') + '</td>';
+    html += '<td class="r vn">' + (x.tCO > 0 ? '-' + eur(x.tCO) : '<span class="vm">—</span>') + '</td>';
+    html += '<td class="r">' + commCell + '</td>';
+    html += '<td class="r">' + netoCell + '</td>';
+    html += '<td class="r">' + pnCell + '</td>';
+    html += '<td class="r">' + volCell(x.mN, x.volTon, "ton") + '</td>';
+    html += '<td class="r">' + volCell(x.mN, x.volKg, "kg") + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody>';
+
+  // TFOOT
+  html += '<tfoot><tr>';
+  html += '<td colspan="5" style="color:var(--muted);font-size:11px">TOTAL (' + r.length + ')</td>';
+  html += '<td class="r">' + eur(tV) + '</td>';
+  html += '<td class="r vn">-' + eur(tPO) + '</td>';
+  html += '<td class="r ' + (tB >= 0 ? "vp" : "vn") + '">' + eur(tB) + '</td>';
+  html += '<td class="r">' + pp(pB) + '</td>';
+  html += '<td class="r vn">-' + eur(tTO) + '</td>';
+  html += '<td class="r vn">-' + eur(tCO) + '</td>';
+  html += '<td class="r vn">-' + eur(tComm) + '</td>';
+  html += '<td class="r ' + (tN >= 0 ? "vp" : "vn") + '">' + eur(tN) + '</td>';
+  html += '<td class="r">' + pp(pN) + '</td>';
+  html += '<td class="r vm">—</td>';
+  html += '<td class="r vm">—</td>';
+  html += '</tr></tfoot>';
+
+  html += '</table></div>';
+  document.getElementById("main").innerHTML = html;
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  loadCfg();
+});
+</script>
+</body>
+</html>
