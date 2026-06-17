@@ -203,9 +203,7 @@ td.ov{color:var(--red2);font-weight:600;}
       <div class="sb-item" data-pg="todos">📋 Todos<span class="sb-cnt" id="cnt-todos">-</span></div>
       <div class="sb-grp">Reunion</div>
       <div class="sb-item" data-pg="reunion">📊 Vista Reunion</div>
-      <div class="sb-grp">Referencias</div>
-      <div class="sb-item" data-pg="clientes">🏢 Clientes<span class="sb-cnt" id="cnt-clientes">-</span></div>
-      <div class="sb-item" data-pg="proveedores">🏭 Proveedores<span class="sb-cnt" id="cnt-proveedores">-</span></div>
+      
     </div>
     <div class="sb-foot">
       <div class="sync-pill" id="syncPill"><span class="sdot"></span><span id="syncMsg">Sin conectar</span></div>
@@ -420,7 +418,9 @@ async function syncAll(){
                 fcarga:       ngdt(rp(r,"Fecha Carga"))||ngdt(rp(r,"FECHA CARGA"))||"",
                 justif:       ngs(rp(r,"Justificante Entrega"))==="Sí"||ngs(rp(r,"Justificante"))==="Sí",
                 obs:          ngrt(rp(r,"Observaciones"))||ngrt(rp(r,"OBSERVACIONES"))||"",
-                volumen:      ng(rp(r,"VOLUMEN (TN)"))||0
+                volumen:      ng(rp(r,"VOLUMEN (TN)"))||0,
+                acid:         ngrt(rp(r,"ACID"))||"",
+                contract:     ngrt(rp(r,"CONTRACT"))||""
               };
             });
             if(nData.has_more && nData.next_cursor){
@@ -437,7 +437,11 @@ async function syncAll(){
       }
     }
 
-    // 5. Build unified operations
+    // 5. Build unified operations (excluir cancelados)
+    soList = soList.filter(function(so){
+      var num=(so.docNumber||"").toUpperCase();
+      return so.status!==99 && !so.cancelled && num.indexOf("CANCEL")===-1;
+    });
     DB.ops = soList.map(function(so){
       var soNum = (so.docNumber||"").toUpperCase();
       var numericPart = soNum.replace(/^[A-Z]+/,"");
@@ -448,10 +452,12 @@ async function syncAll(){
       var nl  = notionMap[soNum] || {};
 
       // Get custom fields
-      var incoterm="", payterms="";
+      var incoterm="", payterms="", acid_hd="", contract_hd="";
       if(so.customFields) so.customFields.forEach(function(cf){
         if(cf.field==="INCOTERM") incoterm=cf.value||"";
         if(cf.field==="PAYMENT TERMS") payterms=cf.value||"";
+        if(cf.field==="ACID") acid_hd=cf.value||"";
+        if(cf.field==="CONTRACT") contract_hd=cf.value||"";
       });
 
       // Holded status: 0=draft/pending, 1=confirmed, 2=closed/delivered
@@ -514,7 +520,9 @@ async function syncAll(){
         factura_n:    nl.factura_n||"",
         justif:       nl.justif||false,
         obs:          nl.obs||so.internalnotes||"",
-        volumen:      nl.volumen||0
+        volumen:      nl.volumen||0,
+        acid:         nl.acid||acid_hd||"",
+        contract:     nl.contract||contract_hd||""
       };
     });
 
@@ -692,7 +700,7 @@ function rRefs(type, label){
 function od(id){
   var p=DB.ops.filter(function(x){return x.id===id;})[0]; if(!p) return;
   document.getElementById("dpanel").innerHTML="<div class='dph'><div><div class='dpnum'>"+es(p.num)+(p.confirmado?" <span style='color:var(--green2)'>CONFIRMADO</span>":"")+"</div><div class='dpcli'>"+es(p.cliente||"-")+"</div><div style='margin-top:6px'>"+chip(p.estado)+"</div></div><div class='dpc' id='dpc'>X</div></div><div class='dpb'>"
-  +"<div class='dps'><div class='dpst'>Operacion comercial <span class='holded-badge'>Holded</span></div><div class='dpg'><div><div class='dpl'>Num. Operacion</div><div class='dpv'>"+es(p.num)+"</div></div><div><div class='dpl'>Fecha</div><div class='dpv'>"+fd(p.fecha)+"</div></div><div><div class='dpl'>Cliente</div><div class='dpv'>"+es(p.cliente||"-")+"</div></div><div><div class='dpl'>Incoterm</div><div class='dpv'>"+es(p.incoterm||"-")+"</div></div><div><div class='dpl'>Payment Terms</div><div class='dpv'>"+es(p.payterms||"-")+"</div></div></div></div>"
+  +"<div class='dps'><div class='dpst'>Operacion comercial <span class='holded-badge'>Holded</span></div><div class='dpg'><div><div class='dpl'>Num. Operacion</div><div class='dpv'>"+es(p.num)+"</div></div><div><div class='dpl'>Fecha</div><div class='dpv'>"+fd(p.fecha)+"</div></div><div><div class='dpl'>Cliente</div><div class='dpv'>"+es(p.cliente||"-")+"</div></div><div><div class='dpl'>Incoterm</div><div class='dpv'>"+es(p.incoterm||"-")+"</div></div><div><div class='dpl'>Payment Terms</div><div class='dpv'>"+es(p.payterms||"-")+"</div></div><div><div class='dpl'>Contrato</div><div class='dpv'>"+es(p.contract||"-")+"</div></div><div><div class='dpl'>ACID</div><div class='dpv'>"+es(p.acid||"-")+"</div></div></div></div>"
   +"<div class='dps'><div class='dpst'>Compra <span class='holded-badge'>Holded PO</span></div><div class='dpg'><div><div class='dpl'>Proveedor</div><div class='dpv'>"+es(p.proveedor||"-")+"</div></div></div></div>"
   +"<div class='dps'><div class='dpst'>Transporte <span class='holded-badge'>Holded TO</span></div><div class='dpg'><div><div class='dpl'>Transportista</div><div class='dpv'>"+es(p.transportista||"-")+"</div></div></div></div>"
   +"<div class='dps'><div class='dpst'>Logistica <span class='notion-badge'>Notion</span></div><div class='dpg'><div><div class='dpl'>Modalidad</div><div class='dpv'>"+es(p.modalidad||"-")+"</div></div><div><div class='dpl'>Forwarder</div><div class='dpv'>"+es(p.forwarder||"-")+"</div></div><div><div class='dpl'>Naviera</div><div class='dpv'>"+es(p.naviera||"-")+"</div></div><div><div class='dpl'>Booking</div><div class='dpv'>"+es(p.booking||"-")+"</div></div><div><div class='dpl'>Buque</div><div class='dpv' style='color:var(--teal2)'>"+es(p.buque||"-")+"</div></div><div><div class='dpl'>IMO</div><div class='dpv' style='color:var(--teal2)'>"+es(p.imo||"-")+"</div></div><div><div class='dpl'>Equipo</div><div class='dpv'>"+es(p.equipo||"-")+"</div></div><div><div class='dpl'>Matrícula</div><div class='dpv'>"+es(p.matricula||"-")+"</div></div><div style='grid-column:span 2'><div class='dpl'>Nº Contenedor(es)</div><div class='dpv' style='color:var(--teal2)'>"+es(p.cont||"-")+"</div></div><div><div class='dpl'>F.Carga</div><div class='dpv'>"+fd(p.fcarga)+"</div></div><div><div class='dpl'>ETD</div><div class='dpv'>"+fd(p.etd)+"</div></div><div><div class='dpl'>ETA</div><div class='dpv'>"+fd(p.eta)+(p.eta&&p.estado==="IN TRANSIT"?" ("+du(p.eta)+"d)":"")+"</div></div><div><div class='dpl'>ATA</div><div class='dpv'>"+fd(p.ata)+"</div></div><div><div class='dpl'>Factura Venta</div><div class='dpv'>"+es(p.factura_n||"-")+"</div></div><div><div class='dpl'>Justificante</div><div class='dpv'>"+(p.justif?"✅ Recibido":"⏳ Pendiente")+"</div></div></div></div>"
