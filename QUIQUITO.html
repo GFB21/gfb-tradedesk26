@@ -401,7 +401,6 @@ async function syncAll(){
               var num=ngrt(rp(r,"Nº Pedido"))||ngrt(rp(r,"Numero Pedido"))||ng(rp(r,"Nombre Completo"))||ng(rp(r,"Name"))||"";
               if(num) notionMap[num.toUpperCase()] = {
                 id:           p.id,
-                confirmado_n: ngs(rp(r,"Confirmado"))==="Sí",
                 factura_n:    ngrt(rp(r,"Factura Venta"))||ngrt(rp(r,"Factura"))||"",
                 modalidad:    ngs(rp(r,"MODALIDAD"))||ngs(rp(r,"Modalidad"))||"",
                 forwarder:    ngrt(rp(r,"FORWARDER"))||ngrt(rp(r,"Forwarder"))||"",
@@ -416,11 +415,12 @@ async function syncAll(){
                 eta:          ngdt(rp(r,"ETA"))||"",
                 ata:          ngdt(rp(r,"ATA"))||"",
                 fcarga:       ngdt(rp(r,"Fecha Carga"))||ngdt(rp(r,"FECHA CARGA"))||"",
-                justif:       ngs(rp(r,"Justificante Entrega"))==="Sí"||ngs(rp(r,"Justificante"))==="Sí",
+                justif:       ngs(rp(r,"Justificante Entrega"))==="SÍ"||ngs(rp(r,"Justificante"))==="SÍ",
                 obs:          ngrt(rp(r,"Observaciones"))||ngrt(rp(r,"OBSERVACIONES"))||"",
                 volumen:      ng(rp(r,"VOLUMEN (TN)"))||0,
                 acid:         ngrt(rp(r,"ACID"))||"",
-                contract:     ngrt(rp(r,"CONTRACT"))||""
+                contract:     ngrt(rp(r,"CONTRACT"))||"",
+                final_dest:   ngrt(rp(r,"FINAL DESTINATION"))||""
               };
             });
             if(nData.has_more && nData.next_cursor){
@@ -461,18 +461,17 @@ async function syncAll(){
       });
 
       // Holded status: 0=draft/pending, 1=confirmed, 2=closed/delivered
-      var holdedStatus = so.status;
       var enNotion = Object.keys(nl).length > 0;
-      var confirmado = enNotion ? nl.confirmado_n : false;
       var factura_n = nl.factura_n || "";
       var ata_v = nl.ata || "";
       var etd_v = nl.etd || "";
+      var fcarga_v = nl.fcarga || "";
       var justif_v = nl.justif || false;
       var estado;
       if(ata_v && factura_n && justif_v)          estado="COMPLETADO";
       else if(ata_v && !justif_v)                 estado="SIN DOC";
       else if(factura_n && etd_v)                 estado="IN TRANSIT";
-      else if(confirmado && !factura_n)            estado="CONFIRMADO";
+      else if(fcarga_v && !factura_n)             estado="CONFIRMADO";
       else                                         estado="PENDIENTE";
 
       // Get product name (first product)
@@ -503,7 +502,6 @@ async function syncAll(){
         costeTransp:  toD ? (toD.total||0) : 0,
         // From Notion (logistics)
         estado:       estado,
-        confirmado:   confirmado,
         etd:          nl.etd||"",
         eta:          nl.eta||"",
         ata:          nl.ata||"",
@@ -522,7 +520,8 @@ async function syncAll(){
         obs:          nl.obs||so.internalnotes||"",
         volumen:      nl.volumen||0,
         acid:         nl.acid||acid_hd||"",
-        contract:     nl.contract||contract_hd||""
+        contract:     nl.contract||contract_hd||"",
+        final_dest:   nl.final_dest||""
       };
     });
 
@@ -604,8 +603,6 @@ function uc(){
   document.getElementById("cnt-transit").textContent=p.filter(function(x){return x.estado==="IN TRANSIT";}).length;
   document.getElementById("cnt-sindoc").textContent=p.filter(function(x){return x.estado==="SIN DOC";}).length;
   document.getElementById("cnt-terminados").textContent=p.filter(function(x){return x.estado==="COMPLETADO";}).length;
-  document.getElementById("cnt-clientes").textContent=Object.keys(DB.clients).length;
-  document.getElementById("cnt-proveedores").textContent=Object.keys(DB.providers).length;
 }
 
 function showPage(pg){
@@ -637,7 +634,12 @@ function rTbl(){
   var tb=sl.map(function(p){
     var d=du(p.eta), ec="";
     if(p.estado==="IN TRANSIT"&&d!==null){if(d<0)ec="ov";else if(d<=7)ec="hot";}
-    return "<tr data-oid='"+p.id+"'><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fcarga)+"</td><td>"+es(p.cliente||"-")+"</td><td>"+es(shortN(p.proveedor))+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='dim'>"+(p.volumen?p.volumen+" tn":"-")+"</td><td class='dim'>"+es(shortN(p.producto))+"</td><td class='tl'>"+es(p.factura_n||"-")+"</td><td class='dim'>"+es(shortT(p.transportista))+"</td></tr>";
+      var hoy = new Date(); hoy.setHours(0,0,0,0);
+  var fcargaD = p.fcarga ? new Date(p.fcarga) : null;
+  if(fcargaD) fcargaD.setHours(0,0,0,0);
+  var esCargaHoy = fcargaD && fcargaD.getTime()===hoy.getTime();
+  var trStyle = esCargaHoy ? " style='background:rgba(255,180,0,0.18);border-left:3px solid #ffb400;'" : "";
+  return "<tr data-oid='"+p.id+"'"+trStyle+"><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fcarga)+"</td><td>"+es(p.cliente||"-")+"</td><td>"+es(shortN(p.proveedor))+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='dim'>"+(p.volumen?p.volumen+" tn":"-")+"</td><td class='dim'>"+es(shortN(p.producto))+"</td><td class='tl'>"+es(p.factura_n||"-")+"</td><td class='dim'>"+es(shortT(p.transportista))+"</td></tr>";
   }).join("");
   return "<div class='tbl-wrap'><div class='tbl-info'><span>"+total+" operaciones</span><span style='color:var(--text3)'>Clic para ver detalle</span></div><div style='overflow-x:auto'><table><thead><tr>"+th+"</tr></thead><tbody>"+tb+"</tbody></table></div></div>"+(pages>1?rPg(PN,pages,total):"");
 }
@@ -656,8 +658,8 @@ function gp2(p){PN=p;render();document.getElementById("content").scrollTop=0;}
 
 // ── MEETING ───────────────────────────────────────────────────────────
 function rMeeting(){
-  var co  = DB.ops.filter(function(p){return p.confirmado&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED"&&p.estado!=="IN TRANSIT";});
-  var uc2 = DB.ops.filter(function(p){return !p.confirmado&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED"&&p.estado!=="IN TRANSIT";});
+  var co  = DB.ops.filter(function(p){return p.fcarga&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED"&&p.estado!=="IN TRANSIT";});
+  var uc2 = DB.ops.filter(function(p){return !p.fcarga&&p.estado!=="DELIVERED"&&p.estado!=="CANCELLED"&&p.estado!=="IN TRANSIT";});
   var tr  = DB.ops.filter(function(p){return p.estado==="IN TRANSIT";});
   var sd  = DB.ops.filter(function(p){return p.ata&&!p.justif&&p.estado!=="CANCELLED";});
   var nw  = new Date().toLocaleDateString("es-ES",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
@@ -683,7 +685,7 @@ function rCard(p,type){
   var logRow=(p.etd||p.eta||p.fcarga)?"<div class='plog'><div><div class='psl'>F.Carga</div><div class='psv'>"+fd(p.fcarga)+"</div></div><div><div class='psl'>ETD</div><div class='psv'>"+fd(p.etd)+"</div></div><div><div class='psl'>ETA</div><div class='psv "+ec+"'>"+ev+"</div></div></div>":"";
   var obs=p.obs_c?"<div class='pobs'>"+es(p.obs_c)+"</div>":"";
   var foot=type==="tran"?"<div class='pfoot'>"+plinks(p)+"</div>":"";
-  return "<div class='pcard "+cls+"' data-oid='"+p.id+"'><div class='pch'><div><div class='pn'>"+es(p.num)+(p.confirmado?" <small style='color:var(--green2)'>CONF</small>":"")+"</div><div class='pcl'>"+es(shortN(p.cliente))+"</div><div class='ppr'>"+es(shortN(p.producto))+"</div></div>"+chip(p.estado)+"</div><div class='pmeta'><div><div class='pml'>Proveedor</div><div class='pmv'>"+es(shortN(p.proveedor))+"</div></div><div><div class='pml'>Transportista</div><div class='pmv'>"+es(shortT(p.transportista))+"</div></div><div><div class='pml'>Incoterm</div><div class='pmv'>"+es(p.incoterm||"-")+"</div></div></div>"+logRow+ship+obs+foot+"</div>";
+  return "<div class='pcard "+cls+"' data-oid='"+p.id+"'><div class='pch'><div><div class='pn'>"+es(p.num)+"</div><div class='pcl'>"+es(shortN(p.cliente))+"</div><div class='ppr'>"+es(shortN(p.producto))+"</div></div>"+chip(p.estado)+"</div><div class='pmeta'><div><div class='pml'>Proveedor</div><div class='pmv'>"+es(shortN(p.proveedor))+"</div></div><div><div class='pml'>Transportista</div><div class='pmv'>"+es(shortT(p.transportista))+"</div></div><div><div class='pml'>Incoterm</div><div class='pmv'>"+es(p.incoterm||"-")+"</div></div></div>"+logRow+ship+obs+foot+"</div>";
 }
 
 // ── REFS ──────────────────────────────────────────────────────────────
@@ -699,8 +701,8 @@ function rRefs(type, label){
 // ── DETAIL ────────────────────────────────────────────────────────────
 function od(id){
   var p=DB.ops.filter(function(x){return x.id===id;})[0]; if(!p) return;
-  document.getElementById("dpanel").innerHTML="<div class='dph'><div><div class='dpnum'>"+es(p.num)+(p.confirmado?" <span style='color:var(--green2)'>CONFIRMADO</span>":"")+"</div><div class='dpcli'>"+es(p.cliente||"-")+"</div><div style='margin-top:6px'>"+chip(p.estado)+"</div></div><div class='dpc' id='dpc'>X</div></div><div class='dpb'>"
-  +"<div class='dps'><div class='dpst'>Operacion comercial <span class='holded-badge'>Holded</span></div><div class='dpg'><div><div class='dpl'>Num. Operacion</div><div class='dpv'>"+es(p.num)+"</div></div><div><div class='dpl'>Fecha</div><div class='dpv'>"+fd(p.fecha)+"</div></div><div><div class='dpl'>Cliente</div><div class='dpv'>"+es(p.cliente||"-")+"</div></div><div><div class='dpl'>Incoterm</div><div class='dpv'>"+es(p.incoterm||"-")+"</div></div><div><div class='dpl'>Payment Terms</div><div class='dpv'>"+es(p.payterms||"-")+"</div></div><div><div class='dpl'>Contrato</div><div class='dpv'>"+es(p.contract||"-")+"</div></div><div><div class='dpl'>ACID</div><div class='dpv'>"+es(p.acid||"-")+"</div></div></div></div>"
+  document.getElementById("dpanel").innerHTML="<div class='dph'><div><div class='dpnum'>"+es(p.num)+"</div><div class='dpcli'>"+es(p.cliente||"-")+"</div><div style='margin-top:6px'>"+chip(p.estado)+"</div></div><div class='dpc' id='dpc'>X</div></div><div class='dpb'>"
+  +"<div class='dps'><div class='dpst'>Operacion comercial <span class='holded-badge'>Holded</span></div><div class='dpg'><div><div class='dpl'>Num. Operacion</div><div class='dpv'>"+es(p.num)+"</div></div><div><div class='dpl'>Fecha</div><div class='dpv'>"+fd(p.fecha)+"</div></div><div><div class='dpl'>Cliente</div><div class='dpv'>"+es(p.cliente||"-")+"</div></div><div><div class='dpl'>Incoterm</div><div class='dpv'>"+es(p.incoterm||"-")+"</div></div><div><div class='dpl'>Payment Terms</div><div class='dpv'>"+es(p.payterms||"-")+"</div></div><div><div class='dpl'>Contrato</div><div class='dpv'>"+es(p.contract||"-")+"</div></div><div><div class='dpl'>Final Destination</div><div class='dpv'>"+es(p.final_dest||"-")+"</div></div><div><div class='dpl'>ACID</div><div class='dpv'>"+es(p.acid||"-")+"</div></div></div></div>"
   +"<div class='dps'><div class='dpst'>Compra <span class='holded-badge'>Holded PO</span></div><div class='dpg'><div><div class='dpl'>Proveedor</div><div class='dpv'>"+es(p.proveedor||"-")+"</div></div></div></div>"
   +"<div class='dps'><div class='dpst'>Transporte <span class='holded-badge'>Holded TO</span></div><div class='dpg'><div><div class='dpl'>Transportista</div><div class='dpv'>"+es(p.transportista||"-")+"</div></div></div></div>"
   +"<div class='dps'><div class='dpst'>Logistica <span class='notion-badge'>Notion</span></div><div class='dpg'><div><div class='dpl'>Modalidad</div><div class='dpv'>"+es(p.modalidad||"-")+"</div></div><div><div class='dpl'>Forwarder</div><div class='dpv'>"+es(p.forwarder||"-")+"</div></div><div><div class='dpl'>Naviera</div><div class='dpv'>"+es(p.naviera||"-")+"</div></div><div><div class='dpl'>Booking</div><div class='dpv'>"+es(p.booking||"-")+"</div></div><div><div class='dpl'>Buque</div><div class='dpv' style='color:var(--teal2)'>"+es(p.buque||"-")+"</div></div><div><div class='dpl'>IMO</div><div class='dpv' style='color:var(--teal2)'>"+es(p.imo||"-")+"</div></div><div><div class='dpl'>Equipo</div><div class='dpv'>"+es(p.equipo||"-")+"</div></div><div><div class='dpl'>Matrícula</div><div class='dpv'>"+es(p.matricula||"-")+"</div></div><div style='grid-column:span 2'><div class='dpl'>Nº Contenedor(es)</div><div class='dpv' style='color:var(--teal2)'>"+es(p.cont||"-")+"</div></div><div><div class='dpl'>F.Carga</div><div class='dpv'>"+fd(p.fcarga)+"</div></div><div><div class='dpl'>ETD</div><div class='dpv'>"+fd(p.etd)+"</div></div><div><div class='dpl'>ETA</div><div class='dpv'>"+fd(p.eta)+(p.eta&&p.estado==="IN TRANSIT"?" ("+du(p.eta)+"d)":"")+"</div></div><div><div class='dpl'>ATA</div><div class='dpv'>"+fd(p.ata)+"</div></div><div><div class='dpl'>Factura Venta</div><div class='dpv'>"+es(p.factura_n||"-")+"</div></div><div><div class='dpl'>Justificante</div><div class='dpv'>"+(p.justif?"✅ Recibido":"⏳ Pendiente")+"</div></div></div></div>"
