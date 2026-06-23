@@ -181,6 +181,9 @@ tr.tbl-sep td{padding:5px 10px;font-size:11px;font-weight:500;color:var(--text2)
     <label>URL del proxy Cloudflare</label>
     <input type="text" id="cfgProxy" value="https://delicate-sun-4d22.aremirez.workers.dev/" />
 
+    <label>GitHub Token (para sincronizar Notion)</label>
+    <input type="password" id="cfgGithub" placeholder="github_pat_xxxxxxxxxxxx" />
+
     <div class="mfooter">
       <button class="btn" id="btnCancel">Cancelar</button>
       <button class="btn pri" id="btnSave">Guardar y conectar</button>
@@ -219,6 +222,7 @@ tr.tbl-sep td{padding:5px 10px;font-size:11px;font-weight:500;color:var(--text2)
       </div>
       <div class="sbox"><span style="color:var(--text3)">🔍</span><input id="sInput" placeholder="Buscar pedido, cliente, proveedor..." type="text" /></div>
       <button class="btn" id="btnExp">CSV</button>
+      <button class="btn" id="btnSync" title="Lanza el sync Holded→Notion y refresca">⟳ Sincronizar Notion</button>
       <button class="btn" id="btnCfg">Config</button>
     </div>
     <div class="content" id="content"><div class="loading"><span class="spin"></span>Cargando...</div></div>
@@ -238,7 +242,11 @@ var NOTION_DB = "35eadf8035b080b896c8d5fed8a64a18";
 var SK_H = "gfb_holded_key";
 var SK_N = "gfb_notion_tok";
 var SK_P = "gfb_proxy_url";
+var SK_G = "gfb_github_tok";
 var CK   = "gfb_cache_v3";
+var GITHUB_TOKEN = "";
+var GH_REPO = "GFB21/gfb-sync";
+var GH_WORKFLOW = "sync.yml";
 
 var DB = { ops:[], clients:{}, providers:{} };
 var notionMap = {};
@@ -252,11 +260,13 @@ function loadCfg(){
   HOLDED_KEY    = localStorage.getItem(SK_H)||"";
   NOTION_TOKEN  = localStorage.getItem(SK_N)||"";
   PROXY         = localStorage.getItem(SK_P)||PROXY;
+  GITHUB_TOKEN  = localStorage.getItem(SK_G)||"";
 }
 function openCfg(){
   document.getElementById("cfgHolded").value = HOLDED_KEY;
   document.getElementById("cfgNotion").value = NOTION_TOKEN;
   document.getElementById("cfgProxy").value  = PROXY;
+  document.getElementById("cfgGithub").value = GITHUB_TOKEN;
   document.getElementById("cfgModal").classList.add("open");
 }
 function closeCfg(){ document.getElementById("cfgModal").classList.remove("open"); }
@@ -264,11 +274,13 @@ function saveCfg(){
   var h=document.getElementById("cfgHolded").value.trim();
   var n=document.getElementById("cfgNotion").value.trim();
   var p=document.getElementById("cfgProxy").value.trim();
+  var g=document.getElementById("cfgGithub").value.trim();
   if(!h){ alert("Introduce la API Key de Holded"); return; }
-  HOLDED_KEY=h; NOTION_TOKEN=n; PROXY=p;
+  HOLDED_KEY=h; NOTION_TOKEN=n; PROXY=p; GITHUB_TOKEN=g;
   localStorage.setItem(SK_H,h);
   localStorage.setItem(SK_N,n);
   localStorage.setItem(SK_P,p);
+  localStorage.setItem(SK_G,g);
   closeCfg();
   syncAll();
 }
@@ -575,6 +587,84 @@ function tlinks(p){
   return "<a class='dplnk msc' href='https://www.msc.com/en/track-a-shipment?agencyPath=msc&bl="+bl+"' target='_blank'>MSC</a> <a class='dplnk wh' href='https://www.wanhai.com/views/cargoTrack/CargoTrack.xhtml?blNo="+bl+"' target='_blank'>Wan Hai</a> <a class='dplnk cma' href='https://www.cma-cgm.com/ebusiness/tracking/search?SearchBy=BL&Reference="+bl+"' target='_blank'>CMA CGM</a> <a class='dplnk cu' href='https://www.culines.com/en/site/bill' target='_blank'>CULines</a> <a class='dplnk mk' href='https://www.maersk.com/tracking/' target='_blank'>Maersk</a> <a class='dplnk vf' href='https://www.vesselfinder.com/vessels?name="+bq+"' target='_blank'>VesselFinder</a> <a class='dplnk mt' href='https://www.marinetraffic.com/en/ais/index/search/all/keyword:"+bq+"' target='_blank'>MarineTraffic</a>";
 }
 
+// ── NOTION SYNC TRIGGER ───────────────────────────────────────────────
+async function triggerNotionSync(){
+  if(!GITHUB_TOKEN){
+    alert("Introduce el GitHub Token en Config para usar esta función.");
+    openCfg();
+    return;
+  }
+  var btn = document.getElementById("btnSync");
+  btn.disabled = true;
+  btn.textContent = "⏳ Lanzando...";
+  setSt("loading","Lanzando sync Notion...");
+
+  try {
+    // 1. Disparar el workflow
+    var trigRes = await fetch("https://api.github.com/repos/"+GH_REPO+"/actions/workflows/"+GH_WORKFLOW+"/dispatches",{
+      method:"POST",
+      headers:{
+        "Authorization":"Bearer "+GITHUB_TOKEN,
+        "Accept":"application/vnd.github+json",
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({ref:"main"})
+    });
+    if(!trigRes.ok){
+      var errBody = await trigRes.text();
+      throw new Error("GitHub API "+trigRes.status+": "+errBody);
+    }
+
+    // 2. Esperar 4s para que GitHub registre el run
+    btn.textContent = "⏳ Esperando run...";
+    await new Promise(function(r){setTimeout(r,4000);});
+
+    // 3. Polling: preguntar cada 6s hasta completed o timeout (3 min)
+    var maxAttempts = 30, attempt = 0, runId = null;
+    while(attempt < maxAttempts){
+      attempt++;
+      var runsRes = await fetch("https://api.github.com/repos/"+GH_REPO+"/actions/workflows/"+GH_WORKFLOW+"/runs?per_page=1&event=workflow_dispatch",{
+        headers:{
+          "Authorization":"Bearer "+GITHUB_TOKEN,
+          "Accept":"application/vnd.github+json"
+        }
+      });
+      if(!runsRes.ok) throw new Error("Error consultando runs: "+runsRes.status);
+      var runsData = await runsRes.json();
+      var run = runsData.workflow_runs && runsData.workflow_runs[0];
+      if(!run){ await new Promise(function(r){setTimeout(r,6000);}); continue; }
+      runId = run.id;
+      var status = run.status;      // queued | in_progress | completed
+      var conclusion = run.conclusion; // success | failure | null
+
+      if(status === "completed"){
+        if(conclusion === "success"){
+          btn.textContent = "✅ Sync OK — recargando...";
+          setSt("loading","Recargando datos...");
+          await new Promise(function(r){setTimeout(r,1500);}); // pausa visual
+          await syncAll();
+          btn.textContent = "⟳ Sincronizar Notion";
+          btn.disabled = false;
+          return;
+        } else {
+          throw new Error("El workflow terminó con estado: "+conclusion);
+        }
+      }
+      // Actualizar texto según progreso
+      btn.textContent = "⏳ "+( status==="in_progress"?"Ejecutando ("+attempt+")":" Esperando ("+attempt+")" )+"...";
+      await new Promise(function(r){setTimeout(r,6000);});
+    }
+    throw new Error("Timeout: el workflow tardó más de 3 minutos.");
+
+  } catch(err){
+    console.error("triggerNotionSync error:", err);
+    setSt("error","Error en sync");
+    btn.textContent = "⚠️ Error — reintenta";
+    btn.disabled = false;
+    alert("Error al sincronizar:\n"+err.message);
+  }
+}
+
 // ── FILTER ────────────────────────────────────────────────────────────
 function gf(){
   var list=DB.ops.slice();
@@ -766,6 +856,7 @@ document.addEventListener("DOMContentLoaded",function(){
   document.getElementById("btnCancel").addEventListener("click",closeCfg);
   document.getElementById("btnSave").addEventListener("click",saveCfg);
   document.getElementById("btnExp").addEventListener("click",expCSV);
+  document.getElementById("btnSync").addEventListener("click",triggerNotionSync);
   document.getElementById("syncPill").addEventListener("click",syncAll);
   document.getElementById("overlay").addEventListener("click",function(e){if(e.target.id==="overlay")cd();});
   document.getElementById("sInput").addEventListener("input",function(){SQ=this.value.trim();PN=1;render();});
