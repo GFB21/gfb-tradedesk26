@@ -745,7 +745,7 @@ function rTbl(){
   if(!list.length) return "<div class='empty'><div style='font-size:40px;opacity:.3;margin-bottom:12px'>📦</div><p>Sin pedidos</p></div>";
   var pages=Math.ceil(total/PS)||1, sl=list.slice((PN-1)*PS,PN*PS);
   var cols=[{f:"num",l:"Operacion"},{f:"fcarga",l:"F.Carga"},{f:"cliente",l:"Cliente"},{f:"proveedor",l:"Proveedor"},{f:"estado",l:"Estado"},{f:"etd",l:"ETD"},{f:"eta",l:"ETA"},{f:"volumen",l:"Tn"},{f:"producto",l:"Producto"},{f:"factura",l:"Factura"},{f:"transportista",l:"Transportista"}];
-  var th=cols.map(function(c){return "<th class='"+(SF===c.f?"srt":"")+"' onclick='ds(this)' data-f='"+c.f+"'>"+c.l+" "+(SF===c.f?(SD===1?"↑":"↓"):"↕")+"</th>";}).join("");
+  var th=cols.map(function(c){return "<th class='"+(SF===c.f?"srt":"")+"' onclick='ds(this)' data-f='"+c.f+"'>"+c.l+" "+(SF===c.f?(SD===1?"↑":"↓"):"↕")+"</th>";}).join("")+"<th style='width:32px'></th>";
   var autoSort=(SF==="num"&&SD===1);
   var secLabels={"CONFIRMADO":"Confirmados","IN TRANSIT":"In transit","PENDIENTE":"Sin confirmar","SIN DOC":"Sin justificante","COMPLETADO":"Completados"};
   var secIcons={"CONFIRMADO":"\u2705","IN TRANSIT":"\U0001F6A2","PENDIENTE":"\u23F3","SIN DOC":"\U0001F4C4","COMPLETADO":"\u2714\uFE0F"};
@@ -763,7 +763,7 @@ function rTbl(){
     if(fcargaD) fcargaD.setHours(0,0,0,0);
     var esCargaHoy=fcargaD&&fcargaD.getTime()===hoy.getTime();
     var trStyle=esCargaHoy?" style='background:rgba(255,180,0,0.18);border-left:3px solid #ffb400;'":"";
-    return sep+"<tr data-oid='"+p.id+"'"+trStyle+"><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fcarga)+"</td><td>"+es(p.cliente||"-")+"</td><td>"+es(shortN(p.proveedor))+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='dim'>"+(p.volumen?p.volumen+" tn":"-")+"</td><td class='dim'>"+es(shortN(p.producto))+"</td><td class='tl'>"+es(p.factura_n||"-")+"</td><td class='dim'>"+es(shortT(p.transportista))+"</td></tr>";
+    return sep+"<tr data-oid='"+p.id+"' data-num='"+es(p.num)+"'"+trStyle+"><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fcarga)+"</td><td>"+es(p.cliente||"-")+"</td><td>"+es(shortN(p.proveedor))+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='dim'>"+(p.volumen?p.volumen+" tn":"-")+"</td><td class='dim'>"+es(shortN(p.producto))+"</td><td class='tl'>"+es(p.factura_n||"-")+"</td><td class='dim'>"+es(shortT(p.transportista))+"</td><td onclick='event.stopPropagation();window.open("detalle-pedido.html?pedido="+encodeURIComponent(this.closest("tr").dataset.num),"_blank")' style='text-align:center;cursor:pointer;padding:4px 8px' title='Tareas e Interacciones'><span style='font-size:13px;opacity:.5;transition:opacity .15s' onmouseover='this.style.opacity=1' onmouseout='this.style.opacity=.5'>📋</span></td></tr>";
   }).join("");
   return "<div class='tbl-wrap'><div class='tbl-info'><span>"+total+" operaciones</span><span style='color:var(--text3)'>Clic para ver detalle</span></div><div style='overflow-x:auto'><table><thead><tr>"+th+"</tr></thead><tbody>"+tb+"</tbody></table></div></div>"+(pages>1?rPg(PN,pages,total):"");
 }
