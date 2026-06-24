@@ -763,7 +763,7 @@ function rTbl(){
     if(fcargaD) fcargaD.setHours(0,0,0,0);
     var esCargaHoy=fcargaD&&fcargaD.getTime()===hoy.getTime();
     var trStyle=esCargaHoy?" style='background:rgba(255,180,0,0.18);border-left:3px solid #ffb400;'":"";
-    return sep+"<tr data-oid='"+p.id+"' data-num='"+es(p.num)+"'"+trStyle+"><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fcarga)+"</td><td>"+es(p.cliente||"-")+"</td><td>"+es(shortN(p.proveedor))+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='dim'>"+(p.volumen?p.volumen+" tn":"-")+"</td><td class='dim'>"+es(shortN(p.producto))+"</td><td class='tl'>"+es(p.factura_n||"-")+"</td><td class='dim'>"+es(shortT(p.transportista))+"</td><td onclick="event.stopPropagation();window.open('detalle-pedido.html?pedido='+encodeURIComponent(this.closest('tr').dataset.num),'_blank')" style='text-align:center;cursor:pointer;padding:4px 8px' title='Tareas e Interacciones'><span style='font-size:13px;opacity:.5;transition:opacity .15s' onmouseover='this.style.opacity=1' onmouseout='this.style.opacity=.5'>📋</span></td></tr>";
+    return sep+"<tr data-oid='"+p.id+"' data-num='"+es(p.num)+"'"+trStyle+"><td class='acc'>"+es(p.num)+"</td><td>"+fd(p.fcarga)+"</td><td>"+es(p.cliente||"-")+"</td><td>"+es(shortN(p.proveedor))+"</td><td>"+chip(p.estado)+"</td><td>"+fd(p.etd)+"</td><td class='"+ec+"'>"+fd(p.eta)+(d!==null&&p.estado==="IN TRANSIT"?" ("+d+"d)":"")+"</td><td class='dim'>"+(p.volumen?p.volumen+" tn":"-")+"</td><td class='dim'>"+es(shortN(p.producto))+"</td><td class='tl'>"+es(p.factura_n||"-")+"</td><td class='dim'>"+es(shortT(p.transportista))+"</td><td class='det-btn' title='Tareas e Interacciones' style='text-align:center;cursor:pointer;padding:4px 8px'><span style='font-size:13px;opacity:.5;transition:opacity .15s'>📋</span></td></tr>";
   }).join("");
   return "<div class='tbl-wrap'><div class='tbl-info'><span>"+total+" operaciones</span><span style='color:var(--text3)'>Clic para ver detalle</span></div><div style='overflow-x:auto'><table><thead><tr>"+th+"</tr></thead><tbody>"+tb+"</tbody></table></div></div>"+(pages>1?rPg(PN,pages,total):"");
 }
@@ -861,7 +861,11 @@ document.addEventListener("DOMContentLoaded",function(){
   document.getElementById("overlay").addEventListener("click",function(e){if(e.target.id==="overlay")cd();});
   document.getElementById("sInput").addEventListener("input",function(){SQ=this.value.trim();PN=1;render();});
   document.querySelectorAll(".sb-item").forEach(function(el){el.addEventListener("click",function(){showPage(this.dataset.pg);});});
-  document.getElementById("content").addEventListener("click",function(e){var t=e.target.closest("[data-oid]");if(t)od(t.dataset.oid);});
+  document.getElementById("content").addEventListener("click",function(e){
+    var btn=e.target.closest(".det-btn");
+    if(btn){ e.stopPropagation(); var tr=btn.closest("tr"); if(tr&&tr.dataset.num) window.open("detalle-pedido.html?pedido="+encodeURIComponent(tr.dataset.num),"_blank"); return; }
+    var t=e.target.closest("[data-oid]");if(t)od(t.dataset.oid);
+  });
   if(HOLDED_KEY){
     if(loadCache()){render();syncAll();}
     else syncAll();
