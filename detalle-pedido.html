@@ -398,21 +398,15 @@ async function init(){
     // Load Tareas
     setLoading("Cargando tareas...");
     var tareas=[];
-    if(NOTION_TOKEN){
+    if(NOTION_TOKEN&&nl.id){
       try{
         var tRaw = await loadAllNotion(DB_TAREAS,{});
         tareas = tRaw.filter(function(p){
           var r=p.properties;
-          if(nl.id){
-          tareas = tRaw.filter(function(p){
-            var r=p.properties;
-            var rel=rp(r,"PEDIDOS");
-            if(!rel||!rel.relation) return false;
-            return rel.relation.some(function(x){ return x.id===nl.id; });
-          });
-        } else {
-          tareas=[];
-        }
+          var rel=rp(r,"PEDIDOS");
+          if(!rel||!rel.relation) return false;
+          return rel.relation.some(function(x){ return x.id===nl.id; });
+        });
       }catch(te){ console.warn("Tareas error:",te); }
     }
 
