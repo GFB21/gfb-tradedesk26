@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detalle Pedido — GFB</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--s1:#161b22;--s2:#1c2330;--s3:#21262d;--border:#30363d;--border2:#3d444d;--accent:#2f81f7;--accent2:#58a6ff;--green2:#56d364;--amber2:#e3b341;--red2:#f85149;--purple2:#a371f7;--teal2:#79c0ff;--text:#e6edf3;--text2:#8b949e;--text3:#484f58;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:Bricolage Grotesque,sans-serif;min-height:100vh;}
+.topbar{height:52px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:100;}
+.topbar-title{font-size:13px;font-weight:700;flex:1;}
+.topbar-num{font-size:12px;color:var(--accent2);font-family:DM Mono,monospace;}
+.btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--s2);color:var(--text2);transition:all .12s;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.btn:hover{border-color:var(--accent);color:var(--accent2);}
+.content{max-width:960px;margin:0 auto;padding:24px 20px;}
+.loading{display:flex;align-items:center;gap:12px;color:var(--text2);font-size:13px;padding:40px 0;}
+.spin{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0;}
+@keyframes sp{to{transform:rotate(360deg)}}
+.error-page{text-align:center;padding:80px 20px;}
+.error-page .icon{font-size:48px;opacity:.3;margin-bottom:16px;}
+.error-page h2{font-size:18px;font-weight:700;margin-bottom:8px;}
+.error-page p{font-size:13px;color:var(--text2);margin-bottom:24px;}
+
+/* Cabecera ficha */
+.ficha{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:24px;}
+.ficha-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.ficha-num{font-size:20px;font-weight:800;font-family:DM Mono,monospace;color:var(--accent2);}
+.ficha-cli{font-size:13px;color:var(--text2);margin-top:4px;}
+.ficha-body{padding:20px;}
+.sections-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.dps{padding:16px 20px;border-bottom:1px solid var(--border);}
+.dps:last-child{border-bottom:none;}
+.dps.full{grid-column:span 2;}
+.dpst{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.dpg{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;}
+.dpg.cols1{grid-template-columns:1fr;}
+.dpl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+.dpv{font-size:12px;font-weight:500;}
+.dpv.tl{color:var(--teal2);}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 8px;border-radius:4px;}
+.badge.notion{background:rgba(47,129,247,.1);color:var(--accent2);}
+.badge.holded{background:rgba(63,185,80,.1);color:var(--green2);}
+.chip{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:500;white-space:nowrap;}
+.ct{background:rgba(138,87,229,.2);color:var(--purple2);}
+.cd{background:rgba(63,185,80,.15);color:var(--green2);}
+.cp{background:rgba(210,153,34,.15);color:var(--amber2);}
+.cc{background:rgba(72,79,88,.3);color:var(--text3);}
+.cs{background:rgba(248,81,73,.15);color:var(--red2);}
+.ca{background:rgba(47,129,247,.15);color:var(--accent2);}
+
+/* Secciones colapsables */
+.section{background:var(--s1);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;overflow:hidden;}
+.section-hdr{padding:14px 18px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;transition:background .12s;}
+.section-hdr:hover{background:var(--s2);}
+.section-title{font-size:13px;font-weight:700;flex:1;}
+.section-count{font-size:11px;color:var(--text3);background:var(--s3);padding:2px 8px;border-radius:10px;}
+.section-arrow{font-size:10px;color:var(--text3);transition:transform .2s;}
+.section-arrow.open{transform:rotate(180deg);}
+.section-body{border-top:1px solid var(--border);}
+.section-body.hidden{display:none;}
+
+/* Tareas */
+.task-group-hdr{padding:8px 18px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);background:var(--s2);border-bottom:1px solid var(--border);}
+.task-row{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;transition:background .1s;}
+.task-row:last-child{border-bottom:none;}
+.task-row:hover{background:var(--s2);}
+.task-name{font-size:13px;font-weight:500;flex:1;}
+.task-meta{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.task-person{font-size:11px;color:var(--text2);}
+.task-date{font-size:11px;font-family:DM Mono,monospace;}
+.task-date.hot{color:var(--amber2);}
+.task-date.ov{color:var(--red2);}
+.task-status{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:500;}
+.ts-pending{background:rgba(210,153,34,.15);color:var(--amber2);}
+.ts-progress{background:rgba(47,129,247,.15);color:var(--accent2);}
+.ts-blocked{background:rgba(248,81,73,.15);color:var(--red2);}
+.ts-done{background:rgba(63,185,80,.12);color:var(--green2);}
+.ts-default{background:rgba(72,79,88,.2);color:var(--text2);}
+.collapse-done-btn{padding:10px 18px;font-size:11px;color:var(--text3);cursor:pointer;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px;}
+.collapse-done-btn:hover{color:var(--text2);}
+
+/* Interacciones */
+.int-row{padding:14px 18px;border-bottom:1px solid var(--border);transition:background .1s;}
+.int-row:last-child{border-bottom:none;}
+.int-row:hover{background:var(--s2);}
+.int-header{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.int-date{font-size:11px;font-family:DM Mono,monospace;color:var(--text2);}
+.int-type{font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(138,87,229,.15);color:var(--purple2);font-weight:500;}
+.int-person{font-size:11px;color:var(--text2);margin-left:auto;}
+.int-summary{font-size:12px;line-height:1.6;color:var(--text);}
+
+.empty{padding:32px 18px;text-align:center;color:var(--text3);font-size:12px;}
+.empty-icon{font-size:28px;opacity:.3;margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="btn" id="btnBack">← Volver</a>
+  <div class="topbar-title">Detalle Pedido</div>
+  <div class="topbar-num" id="topNum"></div>
+</div>
+
+<div class="content" id="content">
+  <div class="loading"><span class="spin"></span>Cargando pedido...</div>
+</div>
+
+<script>
+// ── CONFIG (same localStorage keys as QUIQUITO) ───────────────────────
+var PROXY         = "https://delicate-sun-4d22.aremirez.workers.dev/";
+var HOLDED_KEY    = "";
+var NOTION_TOKEN  = "";
+var NOTION_DB     = "35eadf8035b080b896c8d5fed8a64a18";
+var DB_TAREAS     = "368adf8035b0802980c3ddf89d8b570f";
+var DB_INTER      = "367adf8035b080b9b250c2574cdb646a";
+
+var SK_H = "gfb_holded_key";
+var SK_N = "gfb_notion_tok";
+var SK_P = "gfb_proxy_url";
+
+function loadCfg(){
+  HOLDED_KEY   = localStorage.getItem(SK_H)||"";
+  NOTION_TOKEN = localStorage.getItem(SK_N)||"";
+  PROXY        = localStorage.getItem(SK_P)||PROXY;
+}
+
+// ── PROXY FETCH ───────────────────────────────────────────────────────
+async function hFetch(endpoint){
+  var res = await fetch(PROXY,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({service:"holded",url:"https://api.holded.com/api/"+endpoint,token:HOLDED_KEY})
+  });
+  if(!res.ok) throw new Error("Holded HTTP "+res.status);
+  return await res.json();
+}
+
+async function nFetch(dbId, payload){
+  var res = await fetch(PROXY,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({service:"notion",url:"https://api.notion.com/v1/databases/"+dbId+"/query",token:NOTION_TOKEN,payload:payload||{page_size:100}})
+  });
+  if(!res.ok) throw new Error("Notion HTTP "+res.status);
+  return await res.json();
+}
+
+async function hFetchAll(endpoint){
+  var all=[], page=1, hasMore=true;
+  while(hasMore && page<=20){
+    var data = await hFetch(endpoint+"?page="+page+"&limit=50");
+    if(!Array.isArray(data)||data.length===0){ hasMore=false; break; }
+    all = all.concat(data);
+    if(data.length<50) hasMore=false;
+    page++;
+  }
+  return all;
+}
+
+// ── NOTION HELPERS ────────────────────────────────────────────────────
+function ng(p){
+  if(!p) return "";
+  if(p.title&&p.title[0]) return p.title[0].plain_text||"";
+  if(p.rich_text&&p.rich_text[0]) return p.rich_text[0].plain_text||"";
+  if(p.select) return p.select.name||"";
+  if(p.date) return p.date.start||"";
+  if(p.checkbox!==undefined) return p.checkbox;
+  if(p.number!==undefined) return p.number!==null?p.number:"";
+  return "";
+}
+function ngrt(p){
+  if(!p) return "";
+  if(p.rich_text&&p.rich_text[0]) return p.rich_text[0].plain_text||"";
+  if(p.title&&p.title[0]) return p.title[0].plain_text||"";
+  return "";
+}
+function ngs(p){
+  if(!p) return "";
+  if(p.select) return p.select.name||"";
+  if(p.status) return p.status.name||"";
+  if(p.rich_text&&p.rich_text[0]) return p.rich_text[0].plain_text||"";
+  return "";
+}
+function ngdt(p){
+  if(!p) return "";
+  if(p.date) return p.date.start||"";
+  return "";
+}
+function ngpeople(p){
+  if(!p||!p.people) return "";
+  return p.people.map(function(x){return x.name||"";}).filter(Boolean).join(", ");
+}
+function rp(props,key){
+  if(!props) return null;
+  if(props[key]) return props[key];
+  var lk=key.toLowerCase();
+  for(var k in props){ if(k.toLowerCase()===lk) return props[k]; }
+  return null;
+}
+async function loadAllNotion(dbId, payload){
+  var all=[];
+  async function page(cursor){
+    var pl = Object.assign({page_size:100},payload||{});
+    if(cursor) pl.start_cursor=cursor;
+    var data = await nFetch(dbId,pl);
+    if(data&&data.results) all=all.concat(data.results);
+    if(data&&data.has_more&&data.next_cursor) await page(data.next_cursor);
+  }
+  await page(null);
+  return all;
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────
+function fd(s){if(!s)return "-";var p=s.split("-");return p.length===3?p[2]+"/"+p[1]+"/"+p[0]:s;}
+function du(s){if(!s)return null;return Math.round((new Date(s)-new Date())/86400000);}
+function es(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function chip(st){
+  var m={"IN TRANSIT":["ct","En tránsito"],"COMPLETADO":["cd","Completado"],"CONFIRMADO":["ca","Confirmado"],"PENDIENTE":["cp","Sin confirmar"],"SIN DOC":["cs","Sin justificante"],"CANCELLED":["cc","Cancelado"]};
+  var v=m[st]||["cp",st||"-"];
+  return "<span class='chip "+v[0]+"'>"+v[1]+"</span>";
+}
+function taskStatusChip(st){
+  var s=(st||"").toLowerCase();
+  if(s==="hecho") return "<span class='task-status ts-done'>✓ Hecho</span>";
+  if(s.includes("pendiente")||s.includes("por hacer")||s.includes("to do")) return "<span class='task-status ts-pending'>"+es(st)+"</span>";
+  if(s.includes("curso")||s.includes("progreso")||s.includes("in progress")) return "<span class='task-status ts-progress'>"+es(st)+"</span>";
+  if(s.includes("bloque")||s.includes("blocked")) return "<span class='task-status ts-blocked'>"+es(st)+"</span>";
+  if(s.includes("done")||s.includes("complet")||s.includes("terminad")) return "<span class='task-status ts-done'>"+es(st)+"</span>";
+  return "<span class='task-status ts-default'>"+es(st)+"</span>";
+}
+function isDone(props){
+  // HECHO is a checkbox field
+  var hecho = rp(props,"HECHO");
+  if(hecho && hecho.checkbox !== undefined) return hecho.checkbox === true;
+  // fallback: status text
+  var st = ngs(rp(props,"Estado"))||ngs(rp(props,"Status"))||"";
+  var s = st.toLowerCase();
+  return s.includes("done")||s.includes("complet")||s.includes("terminad");
+}
+function dateClass(dateStr){
+  if(!dateStr) return "";
+  var d=du(dateStr);
+  if(d===null) return "";
+  if(d<0) return "ov";
+  if(d<=3) return "hot";
+  return "";
+}
+
+// ── MAIN ──────────────────────────────────────────────────────────────
+var PEDIDO_ID = "";
+
+async function init(){
+  loadCfg();
+  var params = new URLSearchParams(window.location.search);
+  PEDIDO_ID  = (params.get("pedido")||"").trim().toUpperCase();
+
+  document.getElementById("topNum").textContent = PEDIDO_ID||"";
+  document.getElementById("btnBack").href = "index.html";
+
+  if(!PEDIDO_ID){
+    showError("No se ha indicado ningún pedido","Vuelve a QUIQUITO y accede desde la fila del pedido.");
+    return;
+  }
+  if(!HOLDED_KEY){
+    showError("Sin credenciales","Configura tu API Key de Holded en QUIQUITO primero.");
+    return;
+  }
+
+  try {
+    setLoading("Cargando pedido de Holded...");
+    // Load SO list and find the matching order
+    var soList = await hFetchAll("invoicing/v1/documents/salesorder");
+    var so = soList.find(function(x){ return (x.docNumber||"").trim().toUpperCase()===PEDIDO_ID; });
+
+    if(!so){
+      showError("Pedido no encontrado","El pedido <strong>"+es(PEDIDO_ID)+"</strong> no existe en Holded o ha sido cancelado.");
+      return;
+    }
+
+    // Load PO/TO for this numeric part
+    setLoading("Cruzando PO / TO...");
+    var numericPart = PEDIDO_ID.replace(/^[A-Z]+/,"");
+    var poList = await hFetchAll("invoicing/v1/documents/purchaseorder");
+    var poMap={};
+    poList.forEach(function(po){
+      var num=(po.docNumber||"").toUpperCase();
+      var np=num.replace(/^[A-Z]+/,"");
+      if(!poMap[np]) poMap[np]={};
+      var prefix=num.replace(/[0-9].*/,"");
+      poMap[np][prefix]=po;
+    });
+    var poEntry = poMap[numericPart]||{};
+    var po  = poEntry["PO"]||null;
+    var toD = poEntry["TO"]||null;
+
+    // Load Notion logistics for this pedido
+    setLoading("Cargando logística de Notion...");
+    var nl = {};
+    if(NOTION_TOKEN){
+      try{
+        var nResults = await loadAllNotion(NOTION_DB,{
+          filter:{property:"Nº Pedido",rich_text:{equals:PEDIDO_ID}}
+        });
+        // fallback: load all and match
+        if(!nResults.length){
+          nResults = await loadAllNotion(NOTION_DB,{});
+          nResults = nResults.filter(function(p){
+            var r=p.properties;
+            var num=ngrt(rp(r,"Nº Pedido"))||ng(rp(r,"Nombre Completo"))||ng(rp(r,"Name"))||"";
+            return num.trim().toUpperCase()===PEDIDO_ID;
+          });
+        }
+        if(nResults.length){
+          var r=nResults[0].properties;
+          nl={
+            id:           nResults[0].id,
+            factura_n:    ngrt(rp(r,"Factura Venta"))||ngrt(rp(r,"Factura"))||"",
+            modalidad:    ngs(rp(r,"MODALIDAD"))||ngs(rp(r,"Modalidad"))||"",
+            forwarder:    ngrt(rp(r,"FORWARDER"))||ngrt(rp(r,"Forwarder"))||"",
+            naviera:      ngs(rp(r,"NAVIERA"))||ngs(rp(r,"Naviera"))||"",
+            booking:      ngrt(rp(r,"BOOKING"))||ngrt(rp(r,"Booking"))||"",
+            buque:        ngrt(rp(r,"BUQUE"))||ngrt(rp(r,"Buque"))||"",
+            imo:          ngrt(rp(r,"IMO"))||"",
+            equipo:       ngs(rp(r,"EQUIPO"))||ngs(rp(r,"Equipo"))||"",
+            cont:         ngrt(rp(r,"CONTAINER NR"))||ngrt(rp(r,"Nº CONTENEDOR"))||ngrt(rp(r,"Contenedor"))||"",
+            matricula:    ngrt(rp(r,"MATRICULA"))||ngrt(rp(r,"Matricula"))||"",
+            etd:          ngdt(rp(r,"ETD"))||"",
+            eta:          ngdt(rp(r,"ETA"))||"",
+            ata:          ngdt(rp(r,"ATA"))||"",
+            fcarga:       ngdt(rp(r,"Fecha Carga"))||ngdt(rp(r,"FECHA CARGA"))||"",
+            justif:       ngs(rp(r,"Justificante Entrega"))==="SÍ"||ngs(rp(r,"Justificante"))==="SÍ",
+            obs:          ngrt(rp(r,"Observaciones"))||ngrt(rp(r,"OBSERVACIONES"))||"",
+            volumen:      ng(rp(r,"VOLUMEN (TN)"))||0,
+            acid:         ngrt(rp(r,"ACID"))||"",
+            contract:     ngrt(rp(r,"CONTRACT"))||"",
+            final_dest:   ngrt(rp(r,"FINAL DESTINATION"))||""
+          };
+        }
+      }catch(ne){ console.warn("Notion PEDIDOS error:",ne); }
+    }
+
+    // Build op object (same logic as QUIQUITO)
+    var incoterm="",payterms="",acid_hd="",contract_hd="";
+    if(so.customFields) so.customFields.forEach(function(cf){
+      if(cf.field==="INCOTERM") incoterm=cf.value||"";
+      if(cf.field==="PAYMENT TERMS") payterms=cf.value||"";
+      if(cf.field==="ACID") acid_hd=cf.value||"";
+      if(cf.field==="CONTRACT") contract_hd=cf.value||"";
+    });
+    var factura_n=nl.factura_n||"";
+    var ata_v=nl.ata||"";
+    var etd_v=nl.etd||"";
+    var fcarga_v=nl.fcarga||"";
+    var justif_v=nl.justif||false;
+    var estado;
+    if(ata_v&&factura_n&&justif_v)         estado="COMPLETADO";
+    else if(ata_v&&!justif_v)              estado="SIN DOC";
+    else if(factura_n&&etd_v)              estado="IN TRANSIT";
+    else if(fcarga_v&&!factura_n)          estado="CONFIRMADO";
+    else                                    estado="PENDIENTE";
+    var producto="";
+    if(so.products&&so.products[0]) producto=so.products[0].name||"";
+
+    var op={
+      num:          PEDIDO_ID,
+      fecha:        so.date?new Date(so.date*1000+7200000).toISOString().slice(0,10):"",
+      cliente:      so.contactName||"",
+      producto:     producto,
+      incoterm:     incoterm,
+      payterms:     payterms,
+      acid:         nl.acid||acid_hd||"",
+      contract:     nl.contract||contract_hd||"",
+      final_dest:   nl.final_dest||"",
+      proveedor:    po?(po.contactName||""):"",
+      transportista:toD?(toD.contactName||""):"",
+      estado:       estado,
+      etd:          nl.etd||"",
+      eta:          nl.eta||"",
+      ata:          nl.ata||"",
+      fcarga:       nl.fcarga||"",
+      buque:        nl.buque||"",
+      imo:          nl.imo||"",
+      cont:         nl.cont||"",
+      naviera:      nl.naviera||"",
+      booking:      nl.booking||"",
+      equipo:       nl.equipo||"",
+      matricula:    nl.matricula||"",
+      modalidad:    nl.modalidad||"",
+      forwarder:    nl.forwarder||"",
+      factura_n:    factura_n,
+      justif:       justif_v,
+      obs:          nl.obs||so.internalnotes||"",
+      volumen:      nl.volumen||0
+    };
+
+    // Load Tareas
+    setLoading("Cargando tareas...");
+    var tareas=[];
+    if(NOTION_TOKEN){
+      try{
+        var tRaw = await loadAllNotion(DB_TAREAS,{});
+        tareas = tRaw.filter(function(p){
+          var r=p.properties;
+          if(nl.id){
+          tareas = tRaw.filter(function(p){
+            var r=p.properties;
+            var rel=rp(r,"PEDIDOS");
+            if(!rel||!rel.relation) return false;
+            return rel.relation.some(function(x){ return x.id===nl.id; });
+          });
+        } else {
+          tareas=[];
+        }
+      }catch(te){ console.warn("Tareas error:",te); }
+    }
+
+    // Load Interacciones
+    setLoading("Cargando interacciones...");
+    var inters=[];
+    if(NOTION_TOKEN&&nl.id){
+      try{
+        var iRaw = await loadAllNotion(DB_INTER,{});
+        inters = iRaw.filter(function(p){
+          var r=p.properties;
+          var rel=rp(r,"PEDIDOS");
+          if(!rel||!rel.relation) return false;
+          return rel.relation.some(function(x){ return x.id===nl.id; });
+        });
+        // Sort chronological inverse
+        inters.sort(function(a,b){
+          var da=ngdt(rp(a.properties,"Fecha"))||ng(rp(a.properties,"Fecha"))||"";
+          var db2=ngdt(rp(b.properties,"Fecha"))||ng(rp(b.properties,"Fecha"))||"";
+          return db2.localeCompare(da);
+        });
+      }catch(ie){ console.warn("Interacciones error:",ie); }
+    }
+
+    render(op,tareas,inters);
+
+  } catch(e){
+    showError("Error al cargar datos",e.message);
+  }
+}
+
+function setLoading(msg){
+  document.getElementById("content").innerHTML="<div class='loading'><span class='spin'></span>"+es(msg)+"</div>";
+}
+
+function showError(title,msg){
+  document.getElementById("content").innerHTML=
+    "<div class='error-page'><div class='icon'>⚠️</div><h2>"+es(title)+"</h2><p>"+msg+"</p><a href='index.html' class='btn'>← Volver a QUIQUITO</a></div>";
+}
+
+function render(op, tareas, inters){
+  document.title = "Pedido "+op.num+" — GFB";
+  document.getElementById("topNum").textContent = op.num;
+
+  var html = "";
+
+  // ── CABECERA FICHA ──
+  html += "<div class='ficha'>";
+  html += "<div class='ficha-head'>";
+  html += "<div><div class='ficha-num'>"+es(op.num)+"</div>";
+  html += "<div class='ficha-cli'>"+es(op.cliente||"-")+"</div>";
+  html += "<div style='margin-top:8px'>"+chip(op.estado)+"</div></div>";
+  html += "<div style='display:flex;gap:8px;flex-wrap:wrap'>";
+  if(op.fecha) html += "<div style='font-size:11px;color:var(--text2)'>"+fd(op.fecha)+"</div>";
+  html += "</div>";
+  html += "</div>";
+
+  html += "<div class='ficha-body'>";
+  html += "<div class='sections-grid'>";
+
+  // Operación comercial
+  html += "<div class='dps'><div class='dpst'>Operación comercial <span class='badge holded'>Holded SO</span></div><div class='dpg'>";
+  html += field("Cliente",op.cliente);
+  html += field("Incoterm",op.incoterm);
+  html += field("Payment Terms",op.payterms);
+  html += field("Contrato",op.contract);
+  html += field("Final Destination",op.final_dest);
+  html += field("ACID",op.acid);
+  html += "</div></div>";
+
+  // Producto
+  html += "<div class='dps'><div class='dpst'>Producto <span class='badge holded'>Holded</span></div><div class='dpg'>";
+  html += field("Descripción",op.producto);
+  html += field("Volumen",op.volumen?op.volumen+" tn":"");
+  html += "</div></div>";
+
+  // Compra
+  html += "<div class='dps'><div class='dpst'>Compra <span class='badge holded'>Holded PO</span></div><div class='dpg'>";
+  html += field("Proveedor",op.proveedor);
+  html += "</div></div>";
+
+  // Transporte
+  html += "<div class='dps'><div class='dpst'>Transporte <span class='badge holded'>Holded TO</span></div><div class='dpg'>";
+  html += field("Transportista",op.transportista);
+  html += field("Matrícula",op.matricula);
+  html += "</div></div>";
+
+  // Logística
+  html += "<div class='dps full'><div class='dpst'>Logística <span class='badge notion'>Notion</span></div><div class='dpg'>";
+  html += field("Modalidad",op.modalidad);
+  html += field("Forwarder",op.forwarder);
+  html += field("Naviera",op.naviera);
+  html += field("Booking",op.booking);
+  html += "<div><div class='dpl'>Buque</div><div class='dpv tl'>"+es(op.buque||"-")+"</div></div>";
+  html += "<div><div class='dpl'>IMO</div><div class='dpv tl'>"+es(op.imo||"-")+"</div></div>";
+  html += field("Equipo",op.equipo);
+  html += "<div style='grid-column:span 2'><div class='dpl'>Nº Contenedor(es)</div><div class='dpv tl'>"+es(op.cont||"-")+"</div></div>";
+  html += field("F.Carga",fd(op.fcarga));
+  html += field("ETD",fd(op.etd));
+  html += field("ETA",op.eta?(fd(op.eta)+(op.estado==="IN TRANSIT"?" ("+du(op.eta)+"d)":"")):"-");
+  html += field("ATA",fd(op.ata));
+  html += field("Factura Venta",op.factura_n);
+  html += "<div><div class='dpl'>Justificante</div><div class='dpv'>"+(op.justif?"✅ Recibido":"⏳ Pendiente")+"</div></div>";
+  html += "</div></div>";
+
+  if(op.obs){
+    html += "<div class='dps full'><div class='dpst'>Observaciones</div><div style='font-size:12px;line-height:1.6;color:var(--text2)'>"+es(op.obs)+"</div></div>";
+  }
+
+  html += "</div>"; // sections-grid
+  html += "</div>"; // ficha-body
+  html += "</div>"; // ficha
+
+  // ── TAREAS ──
+  html += renderTareas(tareas);
+
+  // ── INTERACCIONES ──
+  html += renderInters(inters);
+
+  document.getElementById("content").innerHTML = html;
+
+  // Attach collapse listeners
+  document.querySelectorAll(".section-hdr").forEach(function(hdr){
+    hdr.addEventListener("click",function(){
+      var body = this.parentElement.querySelector(".section-body");
+      var arrow = this.querySelector(".section-arrow");
+      if(body.classList.contains("hidden")){
+        body.classList.remove("hidden");
+        arrow.classList.add("open");
+      } else {
+        body.classList.add("hidden");
+        arrow.classList.remove("open");
+      }
+    });
+  });
+  document.querySelectorAll(".collapse-done-btn").forEach(function(btn){
+    btn.addEventListener("click",function(e){
+      e.stopPropagation();
+      var grp=this.parentElement.querySelector(".done-group");
+      if(grp){
+        if(grp.style.display==="none"||grp.style.display===""){
+          grp.style.display="block";
+          this.textContent="▲ Ocultar completadas";
+        } else {
+          grp.style.display="none";
+          this.textContent="▼ Ver completadas ("+grp.querySelectorAll(".task-row").length+")";
+        }
+      }
+    });
+  });
+}
+
+function field(label, val){
+  return "<div><div class='dpl'>"+es(label)+"</div><div class='dpv'>"+es(val||"-")+"</div></div>";
+}
+
+function renderTareas(tareas){
+  var active = tareas.filter(function(t){ return !isDone(t.properties); });
+  var done   = tareas.filter(function(t){ return isDone(t.properties); });
+
+  var html = "<div class='section'>";
+  html += "<div class='section-hdr'>";
+  html += "<div class='section-title'>📋 Tareas</div>";
+  html += "<span class='section-count'>"+tareas.length+"</span>";
+  html += "<span class='section-arrow open'>▼</span>";
+  html += "</div>";
+  html += "<div class='section-body'>";
+
+  if(!tareas.length){
+    html += "<div class='empty'><div class='empty-icon'>📋</div>Sin tareas vinculadas</div>";
+  } else {
+    if(active.length){
+      html += "<div class='task-group-hdr'>Activas</div>";
+      active.forEach(function(t){ html += taskRow(t); });
+    }
+    if(done.length){
+      html += "<div class='collapse-done-btn'>▼ Ver completadas ("+done.length+")</div>";
+      html += "<div class='done-group' style='display:none'>";
+      html += "<div class='task-group-hdr'>Completadas</div>";
+      done.forEach(function(t){ html += taskRow(t); });
+      html += "</div>";
+    }
+  }
+
+  html += "</div></div>";
+  return html;
+}
+
+function taskRow(t){
+  var r=t.properties;
+  var name   = ng(rp(r,"TAREAS"))||ng(rp(r,"Nombre"))||ng(rp(r,"Name"))||"Sin nombre";
+  var hecho  = isDone(r);
+  var status = hecho ? "Hecho" : (ngs(rp(r,"Estado"))||ngs(rp(r,"Status"))||"Pendiente");
+  var person = ngpeople(rp(r,"RESPONSABLE"))||ngpeople(rp(r,"Responsable"))||"";
+  var due    = ngdt(rp(r,"FECHA LÍMITE"))||ngdt(rp(r,"Fecha límite"))||ngdt(rp(r,"Due Date"))||"";
+  var dc     = dateClass(due);
+
+  var html = "<div class='task-row'>";
+  html += "<div class='task-name'>"+es(name)+"</div>";
+  html += "<div class='task-meta'>";
+  if(person) html += "<span class='task-person'>"+es(person)+"</span>";
+  if(due) html += "<span class='task-date "+(dc||"")+"'>"+fd(due)+"</span>";
+  html += taskStatusChip(status);
+  html += "</div></div>";
+  return html;
+}
+
+function renderInters(inters){
+  var html = "<div class='section'>";
+  html += "<div class='section-hdr'>";
+  html += "<div class='section-title'>💬 Interacciones</div>";
+  html += "<span class='section-count'>"+inters.length+"</span>";
+  html += "<span class='section-arrow open'>▼</span>";
+  html += "</div>";
+  html += "<div class='section-body'>";
+
+  if(!inters.length){
+    html += "<div class='empty'><div class='empty-icon'>💬</div>Sin interacciones registradas</div>";
+  } else {
+    inters.forEach(function(i){
+      var r=i.properties;
+      var fecha   = ngdt(rp(r,"FECHA"))||ngdt(rp(r,"Fecha"))||"";
+      var tipo    = ngs(rp(r,"MEDIO COMUNICACION"))||ngs(rp(r,"Tipo"))||"";
+      var resumen = ng(rp(r,"RESUMEN"))||ngrt(rp(r,"Resumen"))||ng(rp(r,"Name"))||"";
+      var persona = ngpeople(rp(r,"Responsable comercial"))||ngpeople(rp(r,"ENCARGADO"))||ngpeople(rp(r,"Responsable"))||"";
+
+      html += "<div class='int-row'>";
+      html += "<div class='int-header'>";
+      if(fecha) html += "<span class='int-date'>"+fd(fecha)+"</span>";
+      if(tipo)  html += "<span class='int-type'>"+es(tipo)+"</span>";
+      if(persona) html += "<span class='int-person'>"+es(persona)+"</span>";
+      html += "</div>";
+      if(resumen) html += "<div class='int-summary'>"+es(resumen)+"</div>";
+      html += "</div>";
+    });
+  }
+
+  html += "</div></div>";
+  return html;
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
