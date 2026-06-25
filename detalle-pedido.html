@@ -398,34 +398,27 @@ async function init(){
     // Load Tareas
     setLoading("Cargando tareas...");
     var tareas=[];
-    if(NOTION_TOKEN&&nl.id){
+    if(NOTION_TOKEN && nl.id){
       try{
-        var tRaw = await loadAllNotion(DB_TAREAS,{});
-        tareas = tRaw.filter(function(p){
-          var r=p.properties;
-          var rel=rp(r,"PEDIDOS");
-          if(!rel||!rel.relation) return false;
-          return rel.relation.some(function(x){ return x.id===nl.id; });
+        var tRaw = await loadAllNotion(DB_TAREAS,{
+          filter:{property:"PEDIDOS",relation:{contains:nl.id}}
         });
+        tareas = tRaw;
       }catch(te){ console.warn("Tareas error:",te); }
     }
 
     // Load Interacciones
     setLoading("Cargando interacciones...");
     var inters=[];
-    if(NOTION_TOKEN&&nl.id){
+    if(NOTION_TOKEN && nl.id){
       try{
-        var iRaw = await loadAllNotion(DB_INTER,{});
-        inters = iRaw.filter(function(p){
-          var r=p.properties;
-          var rel=rp(r,"PEDIDOS");
-          if(!rel||!rel.relation) return false;
-          return rel.relation.some(function(x){ return x.id===nl.id; });
+        var iRaw = await loadAllNotion(DB_INTER,{
+          filter:{property:"PEDIDOS",relation:{contains:nl.id}}
         });
-        // Sort chronological inverse
+        inters = iRaw;
         inters.sort(function(a,b){
-          var da=ngdt(rp(a.properties,"Fecha"))||ng(rp(a.properties,"Fecha"))||"";
-          var db2=ngdt(rp(b.properties,"Fecha"))||ng(rp(b.properties,"Fecha"))||"";
+          var da=ngdt(rp(a.properties,"FECHA"))||ngdt(rp(a.properties,"Fecha"))||"";
+          var db2=ngdt(rp(b.properties,"FECHA"))||ngdt(rp(b.properties,"Fecha"))||"";
           return db2.localeCompare(da);
         });
       }catch(ie){ console.warn("Interacciones error:",ie); }

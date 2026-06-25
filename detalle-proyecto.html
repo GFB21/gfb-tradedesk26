@@ -266,29 +266,23 @@ async function init(){
     setLoading("Cargando tareas...");
     var tareas=[];
     try{
-      var tRaw = await loadAllNotion(DB_TAREAS,{});
-      tareas = tRaw.filter(function(t){
-        var r=t.properties;
-        var rel=rp(r,"PROYECTOS");
-        if(!rel||!rel.relation) return false;
-        return rel.relation.some(function(x){ return x.id===proy.id; });
+      var tRaw = await loadAllNotion(DB_TAREAS,{
+        filter:{property:"PROYECTOS",relation:{contains:proy.id}}
       });
+      tareas = tRaw;
     }catch(te){ console.warn("Tareas error:",te); }
 
     // Load Interacciones linked to this project
     setLoading("Cargando interacciones...");
     var inters=[];
     try{
-      var iRaw = await loadAllNotion(DB_INTER,{});
-      inters = iRaw.filter(function(i){
-        var r=i.properties;
-        var rel=rp(r,"PROYECTO");
-        if(!rel||!rel.relation) return false;
-        return rel.relation.some(function(x){ return x.id===proy.id; });
+      var iRaw = await loadAllNotion(DB_INTER,{
+        filter:{property:"PROYECTO",relation:{contains:proy.id}}
       });
+      inters = iRaw;
       inters.sort(function(a,b){
-        var da=ngdt(rp(a.properties,"Fecha"))||ng(rp(a.properties,"Fecha"))||"";
-        var db2=ngdt(rp(b.properties,"Fecha"))||ng(rp(b.properties,"Fecha"))||"";
+        var da=ngdt(rp(a.properties,"FECHA"))||ngdt(rp(a.properties,"Fecha"))||"";
+        var db2=ngdt(rp(b.properties,"FECHA"))||ngdt(rp(b.properties,"Fecha"))||"";
         return db2.localeCompare(da);
       });
     }catch(ie){ console.warn("Interacciones error:",ie); }
