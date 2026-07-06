@@ -682,9 +682,9 @@ function gf(){
   else if(PAGE==="transit")       list=list.filter(function(p){return p.estado==="IN TRANSIT";});
   else if(PAGE==="sindoc")        list=list.filter(function(p){return p.estado==="SIN DOC";});
   else if(PAGE==="terminados")    list=list.filter(function(p){return p.estado==="COMPLETADO";});
-  else if(PAGE==="resp_luisa")    list=list.filter(function(p){return p.responsable==="LUISA";});
-  else if(PAGE==="resp_imane")    list=list.filter(function(p){return p.responsable==="IMANE";});
-  else if(PAGE==="resp_quique")   list=list.filter(function(p){return p.responsable==="QUIQUE";});
+  else if(PAGE==="resp_luisa")    list=list.filter(function(p){return p.responsable==="LUISA"&&p.estado!=="COMPLETADO"&&p.estado!=="CANCELLED";});
+  else if(PAGE==="resp_imane")    list=list.filter(function(p){return p.responsable==="IMANE"&&p.estado!=="COMPLETADO"&&p.estado!=="CANCELLED";});
+  else if(PAGE==="resp_quique")   list=list.filter(function(p){return p.responsable==="QUIQUE"&&p.estado!=="COMPLETADO"&&p.estado!=="CANCELLED";});
   if(SQ){
     var q=SQ.toLowerCase();
     list=list.filter(function(p){
@@ -695,7 +695,7 @@ function gf(){
     });
   }
   var autoSort=(SF==="num"&&SD===1);
-  if(autoSort&&PAGE==="activos"){
+  if(autoSort&&(PAGE==="activos"||PAGE==="resp_luisa"||PAGE==="resp_imane"||PAGE==="resp_quique")){
     var ord={"CONFIRMADO":0,"IN TRANSIT":1,"PENDIENTE":2,"SIN DOC":3,"COMPLETADO":4,"CANCELLED":5};
     list.sort(function(a,b){
       var oa=ord[a.estado]||9,ob=ord[b.estado]||9;
@@ -732,9 +732,9 @@ function uc(){
   document.getElementById("cnt-transit").textContent=p.filter(function(x){return x.estado==="IN TRANSIT";}).length;
   document.getElementById("cnt-sindoc").textContent=p.filter(function(x){return x.estado==="SIN DOC";}).length;
   document.getElementById("cnt-terminados").textContent=p.filter(function(x){return x.estado==="COMPLETADO";}).length;
-  document.getElementById("cnt-resp_luisa").textContent=p.filter(function(x){return x.responsable==="LUISA";}).length;
-  document.getElementById("cnt-resp_imane").textContent=p.filter(function(x){return x.responsable==="IMANE";}).length;
-  document.getElementById("cnt-resp_quique").textContent=p.filter(function(x){return x.responsable==="QUIQUE";}).length;
+  document.getElementById("cnt-resp_luisa").textContent=p.filter(function(x){return x.responsable==="LUISA"&&x.estado!=="COMPLETADO"&&x.estado!=="CANCELLED";}).length;
+  document.getElementById("cnt-resp_imane").textContent=p.filter(function(x){return x.responsable==="IMANE"&&x.estado!=="COMPLETADO"&&x.estado!=="CANCELLED";}).length;
+  document.getElementById("cnt-resp_quique").textContent=p.filter(function(x){return x.responsable==="QUIQUE"&&x.estado!=="COMPLETADO"&&x.estado!=="CANCELLED";}).length;
 }
 
 function showPage(pg){
@@ -742,7 +742,7 @@ function showPage(pg){
   document.querySelectorAll(".sb-item").forEach(function(e){e.classList.remove("active");});
   var nav=document.querySelector("[data-pg='"+pg+"']");
   if(nav) nav.classList.add("active");
-  var T={"activos":"Pedidos activos","confirmados":"Confirmados","sinconfirmar":"Sin confirmar","transit":"IN TRANSIT","sindoc":"Sin justificante","terminados":"Completados","todos":"Todos los pedidos","reunion":"Vista Reunion Semanal","clientes":"Clientes","proveedores":"Proveedores","buscar":"Búsqueda Cliente/Proveedor/Transportista","resp_luisa":"Pedidos — Luisa","resp_imane":"Pedidos — Imane","resp_quique":"Pedidos — Quique"};
+  var T={"activos":"Pedidos activos","confirmados":"Confirmados","sinconfirmar":"Sin confirmar","transit":"IN TRANSIT","sindoc":"Sin justificante","terminados":"Completados","todos":"Todos los pedidos","reunion":"Vista Reunion Semanal","clientes":"Clientes","proveedores":"Proveedores","buscar":"Búsqueda Cliente/Proveedor/Transportista","resp_luisa":"Pendientes — Luisa","resp_imane":"Pendientes — Imane","resp_quique":"Pendientes — Quique"};
   document.getElementById("pgTitle").textContent=T[pg]||pg;
   render();
 }
@@ -770,7 +770,7 @@ function rTbl(){
   var lastEstado=null;
   var tb=sl.map(function(p){
     var sep="";
-    if(autoSort&&PAGE==="activos"&&p.estado!==lastEstado){
+    if(autoSort&&(PAGE==="activos"||PAGE==="resp_luisa"||PAGE==="resp_imane"||PAGE==="resp_quique")&&p.estado!==lastEstado){
       lastEstado=p.estado;
       sep="<tr class='tbl-sep'><td colspan='13'>"+(secLabels[p.estado]||p.estado)+"</td></tr>";
     }
