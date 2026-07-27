@@ -213,6 +213,8 @@ tr.tbl-sep td{padding:5px 10px;font-size:11px;font-weight:500;color:var(--text2)
       <div class="sb-item" data-pg="resp_luisa">👤 Luisa<span class="sb-cnt" id="cnt-resp_luisa">-</span></div>
       <div class="sb-item" data-pg="resp_imane">👤 Imane<span class="sb-cnt" id="cnt-resp_imane">-</span></div>
       <div class="sb-item" data-pg="resp_quique">👤 Quique<span class="sb-cnt" id="cnt-resp_quique">-</span></div>
+      <div class="sb-grp">Validación</div>
+      <div class="sb-item" data-pg="coherencia">🔗 Coherencia Holded↔Notion<span class="sb-cnt" id="cnt-coherencia">-</span></div>
       
     </div>
     <div class="sb-foot">
@@ -254,7 +256,7 @@ var GITHUB_TOKEN = "";
 var GH_REPO = "GFB21/gfb-sync";
 var GH_WORKFLOW = "sync.yml";
 
-var DB = { ops:[], clients:{}, providers:{} };
+var DB = { ops:[], clients:{}, providers:{}, coherencia:[] };
 var notionMap = {};
 var PAGE = "activos", SQ = "", SF = "num", SD = 1, PN = 1, PS = 50;
 
@@ -455,6 +457,45 @@ async function syncAll(){
         console.error("Notion error:", ne);
         document.getElementById("srcNotion").textContent = "Notion (sin token)";
       }
+    }
+
+    // 4b. Coherencia Holded↔Notion: facturas de compra vs Nº Pedido
+    //     Solo se comparan tags que son 100% dígitos (cualquier tag con letras es
+    //     ruido: código de producto, lote, contenedor... no referencia de pedido).
+    //     No crea ni escribe nada en Notion — solo se muestra en este dashboard.
+    DB.coherencia = [];
+    try {
+      setSt("loading","Validando facturas de compra...");
+      var purchaseInvList = await hFetchAll("invoicing/v1/documents/purchase");
+      var digitTags = {};  // dígitos-puros del tag -> {rawTag, docNumber}
+      purchaseInvList.forEach(function(inv){
+        (inv.tags||[]).forEach(function(rawTag){
+          var t = String(rawTag||"").trim();
+          if(/^\d+$/.test(t) && !digitTags[t]){
+            digitTags[t] = {rawTag:t, docNumber:inv.docNumber};
+          }
+        });
+      });
+      var digitTagKeys = Object.keys(digitTags);
+      Object.keys(notionMap).forEach(function(num){
+        var dig = num.replace(/^[A-Z]+/,"");
+        if(!dig) return;
+        if(digitTags[dig]) return; // OK exacto — no se muestra
+        // Posible tag truncado: mismo tramo final de dígitos, más corto (ej. falta el '2' inicial de año)
+        var truncado=null;
+        digitTagKeys.forEach(function(t){
+          if(t.length>=4 && t.length<dig.length && dig.slice(-t.length)===t) truncado=digitTags[t];
+        });
+        if(truncado){
+          DB.coherencia.push({num:num, dig:dig, estado:"inconsistente",
+            tagEncontrado:truncado.rawTag, factura:truncado.docNumber});
+        } else {
+          DB.coherencia.push({num:num, dig:dig, estado:"sin_factura", tagEncontrado:"", factura:""});
+        }
+      });
+      DB.coherencia.sort(function(a,b){return a.num.localeCompare(b.num);});
+    } catch(pe){
+      console.error("Error validando facturas de compra:", pe);
     }
 
     // 5. Build unified operations (excluir cancelados)
@@ -735,6 +776,8 @@ function uc(){
   document.getElementById("cnt-resp_luisa").textContent=p.filter(function(x){return x.responsable==="LUISA"&&x.estado!=="COMPLETADO"&&x.estado!=="CANCELLED";}).length;
   document.getElementById("cnt-resp_imane").textContent=p.filter(function(x){return x.responsable==="IMANE"&&x.estado!=="COMPLETADO"&&x.estado!=="CANCELLED";}).length;
   document.getElementById("cnt-resp_quique").textContent=p.filter(function(x){return x.responsable==="QUIQUE"&&x.estado!=="COMPLETADO"&&x.estado!=="CANCELLED";}).length;
+  var cntCoh=document.getElementById("cnt-coherencia");
+  if(cntCoh) cntCoh.textContent=(DB.coherencia||[]).length;
 }
 
 function showPage(pg){
@@ -742,7 +785,7 @@ function showPage(pg){
   document.querySelectorAll(".sb-item").forEach(function(e){e.classList.remove("active");});
   var nav=document.querySelector("[data-pg='"+pg+"']");
   if(nav) nav.classList.add("active");
-  var T={"activos":"Pedidos activos","confirmados":"Confirmados","sinconfirmar":"Sin confirmar","transit":"IN TRANSIT","sindoc":"Sin justificante","terminados":"Completados","todos":"Todos los pedidos","reunion":"Vista Reunion Semanal","clientes":"Clientes","proveedores":"Proveedores","buscar":"Búsqueda Cliente/Proveedor/Transportista","resp_luisa":"Pendientes — Luisa","resp_imane":"Pendientes — Imane","resp_quique":"Pendientes — Quique"};
+  var T={"activos":"Pedidos activos","confirmados":"Confirmados","sinconfirmar":"Sin confirmar","transit":"IN TRANSIT","sindoc":"Sin justificante","terminados":"Completados","todos":"Todos los pedidos","reunion":"Vista Reunion Semanal","clientes":"Clientes","proveedores":"Proveedores","buscar":"Búsqueda Cliente/Proveedor/Transportista","resp_luisa":"Pendientes — Luisa","resp_imane":"Pendientes — Imane","resp_quique":"Pendientes — Quique","coherencia":"Coherencia Holded↔Notion — Facturas de compra"};
   document.getElementById("pgTitle").textContent=T[pg]||pg;
   render();
 }
@@ -755,6 +798,32 @@ function render(){
   else if(PAGE==="clientes") el.innerHTML=rRefs("clients","Cliente");
   else if(PAGE==="proveedores") el.innerHTML=rRefs("providers","Proveedor");
   else if(PAGE==="buscar") el.innerHTML=rBuscar();
+  else if(PAGE==="coherencia") el.innerHTML=rCoherencia();
+}
+
+// ── COHERENCIA HOLDED↔NOTION (facturas de compra vs Nº Pedido) ────────
+function rCoherencia(){
+  var list=(DB.coherencia||[]).slice();
+  var nota="<div style='font-size:12px;color:var(--text3);margin-bottom:12px'>Compara, para cada Nº Pedido de Notion, si existe una factura de compra en Holded con ese mismo número como tag. Solo se listan aquí los pedidos con incidencia — los que coinciden exactamente no aparecen. Esta validación no escribe nada en Notion ni en Holded.</div>";
+  if(SQ){
+    var q=SQ.toLowerCase();
+    list=list.filter(function(x){return [x.num,x.tagEncontrado,x.factura].some(function(v){return (v||"").toLowerCase().indexOf(q)>-1;});});
+  }
+  if(!list.length) return nota+"<div class='empty'><div style='font-size:40px;opacity:.3;margin-bottom:12px'>✅</div><p>Sin incidencias — todos los pedidos tienen factura de compra con tag consistente</p></div>";
+  var sinFactura=list.filter(function(x){return x.estado==="sin_factura";});
+  var inconsist=list.filter(function(x){return x.estado==="inconsistente";});
+  var tb=function(items,cols){
+    return items.map(function(x){return cols(x);}).join("");
+  };
+  var seccionSin = sinFactura.length ? "<div class='msh' style='background:rgba(248,81,73,.1);border-radius:6px 6px 0 0;padding:9px 16px;font-size:12px;font-weight:600;color:var(--red2)'>❌ Sin factura vinculada ("+sinFactura.length+")</div>"
+    +"<div class='tbl-wrap' style='border-radius:0 0 8px 8px;margin-bottom:20px'><table><thead><tr><th>Nº Pedido</th><th>Dígitos esperados</th></tr></thead><tbody>"
+    +sinFactura.map(function(x){return "<tr><td class='acc'>"+es(x.num)+"</td><td class='dim'>"+es(x.dig)+"</td></tr>";}).join("")
+    +"</tbody></table></div>" : "";
+  var seccionInc = inconsist.length ? "<div class='msh' style='background:rgba(210,153,34,.1);border-radius:6px 6px 0 0;padding:9px 16px;font-size:12px;font-weight:600;color:var(--amber2)'>⚠️ Tag inconsistente ("+inconsist.length+")</div>"
+    +"<div class='tbl-wrap' style='border-radius:0 0 8px 8px'><table><thead><tr><th>Nº Pedido</th><th>Dígitos esperados</th><th>Tag encontrado en Holded</th><th>Factura</th></tr></thead><tbody>"
+    +inconsist.map(function(x){return "<tr><td class='acc'>"+es(x.num)+"</td><td class='dim'>"+es(x.dig)+"</td><td class='ov'>"+es(x.tagEncontrado)+"</td><td class='tl'>"+es(x.factura)+"</td></tr>";}).join("")
+    +"</tbody></table></div>" : "";
+  return nota+seccionSin+seccionInc;
 }
 
 // ── TABLE ─────────────────────────────────────────────────────────────
