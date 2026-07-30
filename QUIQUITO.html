@@ -257,7 +257,7 @@ var GH_WORKFLOW = "sync.yml";
 
 var DB = { ops:[], clients:{}, providers:{} };
 var notionMap = {};
-var PAGE = "activos", SQ = "", SF = "num", SD = 1, PN = 1, PS = 50, SR = {cliente:true,proveedor:true,transportista:true};
+var PAGE = "activos", SQ = "", SF = "num", SD = 1, PN = 1, PS = 50, SR = {cliente:true,proveedor:true,transportista:true}, SV = true;
 
 function ts(){ return new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}); }
 function setSt(t,m){ var e=document.getElementById("syncPill"); e.className="sync-pill "+t; document.getElementById("syncMsg").textContent=m; }
@@ -739,7 +739,7 @@ function uc(){
 }
 
 function showPage(pg){
-  PAGE=pg;PN=1;SQ="";SR={cliente:true,proveedor:true,transportista:true};document.getElementById("sInput").value="";
+  PAGE=pg;PN=1;SQ="";SR={cliente:true,proveedor:true,transportista:true};SV=true;document.getElementById("sInput").value="";
   document.querySelectorAll(".sb-item").forEach(function(e){e.classList.remove("active");});
   var nav=document.querySelector("[data-pg='"+pg+"']");
   if(nav) nav.classList.add("active");
@@ -847,21 +847,36 @@ function toggleSR(r){
   if(!SR.cliente&&!SR.proveedor&&!SR.transportista) SR[r]=true; // no permitir dejar los 3 desactivados
   PN=1;render();
 }
+function toggleSV(){ SV=!SV; PN=1; render(); }
 function rBuscar(){
   var q=SQ.trim().toLowerCase();
   var roles=[{k:"cliente",l:"Cliente"},{k:"proveedor",l:"Proveedor"},{k:"transportista",l:"Transportista"}];
   var activeCount=roles.filter(function(r){return SR[r.k];}).length;
-  var chips="<div style='display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap'>"+roles.map(function(r){
+  var chips="<div style='display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap'>"+roles.map(function(r){
     var on=SR[r.k];
     return "<button class='rolebtn"+(on?" active":"")+"' onclick='toggleSR(\""+r.k+"\")' style='padding:5px 12px;border-radius:14px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid "+(on?"var(--accent,#3b82f6)":"var(--border,#333)")+";background:"+(on?"var(--accent,#3b82f6)":"transparent")+";color:"+(on?"#fff":"var(--text3)")+"'>"+(on?"✓ ":"")+r.l+"</button>";
-  }).join("")+"</div>";
-  var nota="<div style='font-size:12px;color:var(--text3);margin-bottom:12px'>Busca arriba por nombre de cliente, proveedor o transportista. Marca/desmarca roles para combinarlos y evitar ruido cuando una empresa opera con doble función (p.ej. como cliente y como proveedor).</div>"+chips;
+  }).join("")
+  +"<button class='rolebtn"+(SV?" active":"")+"' onclick='toggleSV()' style='padding:5px 12px;border-radius:14px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid "+(SV?"var(--accent,#3b82f6)":"var(--border,#333)")+";background:"+(SV?"var(--accent,#3b82f6)":"transparent")+";color:"+(SV?"#fff":"var(--text3)")+"'>"+(SV?"✓ ":"")+"Solo vigentes</button>"
+  +"</div>";
+  var nota="<div style='font-size:12px;color:var(--text3);margin-bottom:12px'>Busca arriba por nombre de cliente, proveedor o transportista. Marca/desmarca roles para combinarlos y evitar ruido cuando una empresa opera con doble función. \"Solo vigentes\" oculta completados/cancelados y ordena por fecha de carga — pensado para ver próximas cargas.</div>"+chips;
   if(!q) return nota+"<div class='empty'><div style='font-size:40px;opacity:.3;margin-bottom:12px'>🔎</div><p>Escribe un término de búsqueda arriba</p></div>";
   var list=DB.ops.filter(function(p){
-    return roles.some(function(r){return SR[r.k]&&(p[r.k]||"").toLowerCase().indexOf(q)>-1;});
+    if(!roles.some(function(r){return SR[r.k]&&(p[r.k]||"").toLowerCase().indexOf(q)>-1;})) return false;
+    if(SV && (p.estado==="COMPLETADO"||p.estado==="CANCELLED")) return false;
+    return true;
   });
-  list.sort(function(a,b){return (a.cliente||"").localeCompare(b.cliente||"")||b.num.localeCompare(a.num);});
-  if(!list.length) return nota+"<div class='empty'><div style='font-size:40px;opacity:.3;margin-bottom:12px'>🔍</div><p>Sin resultados</p></div>";
+  if(SV){
+    // Próximas cargas primero: por fecha de carga ascendente; sin fecha de carga al final
+    list.sort(function(a,b){
+      if(!a.fcarga&&!b.fcarga) return b.num.localeCompare(a.num);
+      if(!a.fcarga) return 1;
+      if(!b.fcarga) return -1;
+      return a.fcarga.localeCompare(b.fcarga);
+    });
+  } else {
+    list.sort(function(a,b){return (a.cliente||"").localeCompare(b.cliente||"")||b.num.localeCompare(a.num);});
+  }
+  if(!list.length) return nota+"<div class='empty'><div style='font-size:40px;opacity:.3;margin-bottom:12px'>🔍</div><p>Sin resultados"+(SV?" vigentes":"")+"</p></div>";
   var mkCell=function(p,role){
     var matched=SR[role]&&(p[role]||"").toLowerCase().indexOf(q)>-1;
     return "<td"+(matched?" style='font-weight:700;color:var(--text)'":" class='dim'")+">"+es(p[role]||"-")+"</td>";
