@@ -441,7 +441,8 @@ async function syncAll(){
                 acid:         ngrt(rp(r,"ACID"))||"",
                 contract:     ngrt(rp(r,"CONTRACT"))||"",
                 final_dest:   ngrt(rp(r,"FINAL DESTINATION"))||"",
-                responsable:  ngs(rp(r,"RESPONSABLE "))||ngs(rp(r,"RESPONSABLE"))||""
+                responsable:  ngs(rp(r,"RESPONSABLE "))||ngs(rp(r,"RESPONSABLE"))||"",
+                cancelado:    ngs(rp(r,"ESTADO"))==="CANCELLED"
               };
             });
             if(nData.has_more && nData.next_cursor){
@@ -488,12 +489,14 @@ async function syncAll(){
       var etd_v = nl.etd || "";
       var fcarga_v = nl.fcarga || "";
       var justif_v = nl.justif || false;
+      var cancelado_v = nl.cancelado || false;
       var estado;
-      if(ata_v && factura_n && justif_v)          estado="COMPLETADO";
-      else if(ata_v && !justif_v)                 estado="SIN DOC";
-      else if(factura_n && etd_v)                 estado="IN TRANSIT";
-      else if(fcarga_v && !factura_n)             estado="CONFIRMADO";
-      else                                         estado="PENDIENTE";
+      if(cancelado_v)                              estado="CANCELLED";
+      else if(ata_v && factura_n && justif_v)      estado="COMPLETADO";
+      else if(ata_v && !justif_v)                  estado="SIN DOC";
+      else if(factura_n && etd_v)                  estado="IN TRANSIT";
+      else if(fcarga_v && !factura_n)              estado="CONFIRMADO";
+      else                                          estado="PENDIENTE";
 
       // Get product name (first product)
       var producto = "";
