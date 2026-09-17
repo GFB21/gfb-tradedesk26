@@ -434,7 +434,7 @@ async function syncAll(){
                 etd:          ngdt(rp(r,"ETD"))||"",
                 eta:          ngdt(rp(r,"ETA"))||"",
                 ata:          ngdt(rp(r,"ATA"))||"",
-                fcarga:       ngdt(rp(r,"Fecha Carga"))||ngdt(rp(r,"FECHA CARGA"))||"",
+                fcarga:       ngdt(rp(r,"F. CARGA"))||ngdt(rp(r,"Fecha Carga"))||ngdt(rp(r,"FECHA CARGA"))||"",
                 justif:       ngs(rp(r,"Justificante Entrega"))==="SÍ"||ngs(rp(r,"Justificante"))==="SÍ",
                 obs:          ngrt(rp(r,"Observaciones"))||ngrt(rp(r,"OBSERVACIONES"))||"",
                 volumen:      ng(rp(r,"VOLUMEN (TN)"))||0,
