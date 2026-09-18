@@ -181,9 +181,6 @@ tr.tbl-sep td{padding:5px 10px;font-size:11px;font-weight:500;color:var(--text2)
     <label>URL del proxy Cloudflare</label>
     <input type="text" id="cfgProxy" value="https://delicate-sun-4d22.aremirez.workers.dev/" />
 
-    <label>GitHub Token (para sincronizar Notion)</label>
-    <input type="password" id="cfgGithub" placeholder="github_pat_xxxxxxxxxxxx" />
-
     <div class="mfooter">
       <button class="btn" id="btnCancel">Cancelar</button>
       <button class="btn pri" id="btnSave">Guardar y conectar</button>
@@ -249,11 +246,10 @@ var NOTION_DB = "35eadf8035b080b896c8d5fed8a64a18";
 var SK_H = "gfb_holded_key";
 var SK_N = "gfb_notion_tok";
 var SK_P = "gfb_proxy_url";
-var SK_G = "gfb_github_tok";
 var CK   = "gfb_cache_v3";
-var GITHUB_TOKEN = "";
-var GH_REPO = "GFB21/gfb-sync";
-var GH_WORKFLOW = "sync.yml";
+// El GitHub Token para forzar el sync YA NO vive aquí (ni en localStorage de
+// cada navegador): lo guarda el propio Worker de Cloudflare como secreto y
+// hace de intermediario (service:"github") — ver ghFetch() más abajo.
 
 var DB = { ops:[], clients:{}, providers:{} };
 var notionMap = {};
@@ -267,13 +263,11 @@ function loadCfg(){
   HOLDED_KEY    = localStorage.getItem(SK_H)||"";
   NOTION_TOKEN  = localStorage.getItem(SK_N)||"";
   PROXY         = localStorage.getItem(SK_P)||PROXY;
-  GITHUB_TOKEN  = localStorage.getItem(SK_G)||"";
 }
 function openCfg(){
   document.getElementById("cfgHolded").value = HOLDED_KEY;
   document.getElementById("cfgNotion").value = NOTION_TOKEN;
   document.getElementById("cfgProxy").value  = PROXY;
-  document.getElementById("cfgGithub").value = GITHUB_TOKEN;
   document.getElementById("cfgModal").classList.add("open");
 }
 function closeCfg(){ document.getElementById("cfgModal").classList.remove("open"); }
@@ -281,13 +275,11 @@ function saveCfg(){
   var h=document.getElementById("cfgHolded").value.trim();
   var n=document.getElementById("cfgNotion").value.trim();
   var p=document.getElementById("cfgProxy").value.trim();
-  var g=document.getElementById("cfgGithub").value.trim();
   if(!h){ alert("Introduce la API Key de Holded"); return; }
-  HOLDED_KEY=h; NOTION_TOKEN=n; PROXY=p; GITHUB_TOKEN=g;
+  HOLDED_KEY=h; NOTION_TOKEN=n; PROXY=p;
   localStorage.setItem(SK_H,h);
   localStorage.setItem(SK_N,n);
   localStorage.setItem(SK_P,p);
-  localStorage.setItem(SK_G,g);
   closeCfg();
   syncAll();
 }
@@ -441,6 +433,7 @@ async function syncAll(){
                 acid:         ngrt(rp(r,"ACID"))||"",
                 contract:     ngrt(rp(r,"CONTRACT"))||"",
                 final_dest:   ngrt(rp(r,"FINAL DESTINATION"))||"",
+                customer_po:  ngrt(rp(r,"CUSTOMER PO"))||"",
                 responsable:  ngs(rp(r,"RESPONSABLE "))||ngs(rp(r,"RESPONSABLE"))||"",
                 cancelado:    ngs(rp(r,"ESTADO"))==="CANCELLED"
               };
@@ -474,12 +467,13 @@ async function syncAll(){
       var nl  = notionMap[soNum] || {};
 
       // Get custom fields
-      var incoterm="", payterms="", acid_hd="", contract_hd="";
+      var incoterm="", payterms="", acid_hd="", contract_hd="", customer_po="";
       if(so.customFields) so.customFields.forEach(function(cf){
         if(cf.field==="INCOTERM") incoterm=cf.value||"";
         if(cf.field==="PAYMENT TERMS") payterms=cf.value||"";
         if(cf.field==="ACID") acid_hd=cf.value||"";
         if(cf.field==="CONTRACT") contract_hd=cf.value||"";
+        if(cf.field==="CUSTOMER PO") customer_po=cf.value||"";
       });
 
       // Holded status: 0=draft/pending, 1=confirmed, 2=closed/delivered
@@ -514,6 +508,7 @@ async function syncAll(){
         currency:     so.currency||"eur",
         incoterm:     incoterm,
         payterms:     payterms,
+        customer_po:  customer_po||nl.customer_po||"",
         tags:         so.tags||[],
         notes:        so.notes||"",
         internalnotes:so.internalnotes||"",
@@ -600,28 +595,28 @@ function tlinks(p){
 }
 
 // ── NOTION SYNC TRIGGER ───────────────────────────────────────────────
+// El token de GitHub con permiso de escritura sobre GFB21/gfb-sync ya NO
+// vive en el navegador de cada comercial: el Worker de Cloudflare lo guarda
+// como secreto y hace de intermediario, igual que ya hace con Holded/Notion
+// (hFetch/nFetch). Así cualquiera puede pulsar "Sincronizar Notion" sin
+// tener ni pegar un token propio.
+async function ghFetch(action){
+  return await fetch(PROXY,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({service:"github",action:action})
+  });
+}
+
 async function triggerNotionSync(){
-  if(!GITHUB_TOKEN){
-    alert("Introduce el GitHub Token en Config para usar esta función.");
-    openCfg();
-    return;
-  }
   var btn = document.getElementById("btnSync");
   btn.disabled = true;
   btn.textContent = "⏳ Lanzando...";
   setSt("loading","Lanzando sync Notion...");
 
   try {
-    // 1. Disparar el workflow
-    var trigRes = await fetch("https://api.github.com/repos/"+GH_REPO+"/actions/workflows/"+GH_WORKFLOW+"/dispatches",{
-      method:"POST",
-      headers:{
-        "Authorization":"Bearer "+GITHUB_TOKEN,
-        "Accept":"application/vnd.github+json",
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({ref:"main"})
-    });
+    // 1. Disparar el workflow (vía Worker)
+    var trigRes = await ghFetch("dispatch");
     if(!trigRes.ok){
       var errBody = await trigRes.text();
       throw new Error("GitHub API "+trigRes.status+": "+errBody);
@@ -635,12 +630,7 @@ async function triggerNotionSync(){
     var maxAttempts = 30, attempt = 0, runId = null;
     while(attempt < maxAttempts){
       attempt++;
-      var runsRes = await fetch("https://api.github.com/repos/"+GH_REPO+"/actions/workflows/"+GH_WORKFLOW+"/runs?per_page=1&event=workflow_dispatch",{
-        headers:{
-          "Authorization":"Bearer "+GITHUB_TOKEN,
-          "Accept":"application/vnd.github+json"
-        }
-      });
+      var runsRes = await ghFetch("runs");
       if(!runsRes.ok) throw new Error("Error consultando runs: "+runsRes.status);
       var runsData = await runsRes.json();
       var run = runsData.workflow_runs && runsData.workflow_runs[0];
@@ -693,7 +683,7 @@ function gf(){
     var q=SQ.toLowerCase();
     list=list.filter(function(p){
       return [p.num,p.cliente,p.factura,p.factura_n,p.proveedor,p.producto,p.buque,p.obs,p.transportista,
-              p.incoterm,p.payterms,p.contract,p.final_dest,p.acid,p.naviera,p.booking,p.imo,p.cont,
+              p.incoterm,p.payterms,p.customer_po,p.contract,p.final_dest,p.acid,p.naviera,p.booking,p.imo,p.cont,
               p.equipo,p.matricula,p.forwarder,p.modalidad,p.responsable,p.notes,p.internalnotes
              ].some(function(v){return (v||"").toLowerCase().indexOf(q)>-1;});
     });
@@ -905,7 +895,7 @@ function rBuscar(){
 function od(id){
   var p=DB.ops.filter(function(x){return x.id===id;})[0]; if(!p) return;
   document.getElementById("dpanel").innerHTML="<div class='dph'><div><div class='dpnum'>"+es(p.num)+"</div><div class='dpcli'>"+es(p.cliente||"-")+"</div><div style='margin-top:6px'>"+chip(p.estado)+"</div></div><div class='dpc' id='dpc'>X</div></div><div class='dpb'>"
-  +"<div class='dps'><div class='dpst'>Operacion comercial <span class='holded-badge'>Holded</span></div><div class='dpg'><div><div class='dpl'>Num. Operacion</div><div class='dpv'>"+es(p.num)+"</div></div><div><div class='dpl'>Fecha</div><div class='dpv'>"+fd(p.fecha)+"</div></div><div><div class='dpl'>Cliente</div><div class='dpv'>"+es(p.cliente||"-")+"</div></div><div><div class='dpl'>Responsable</div><div class='dpv'>"+es(p.responsable||"-")+"</div></div><div><div class='dpl'>Incoterm</div><div class='dpv'>"+es(p.incoterm||"-")+"</div></div><div><div class='dpl'>Payment Terms</div><div class='dpv'>"+es(p.payterms||"-")+"</div></div><div><div class='dpl'>Contrato</div><div class='dpv'>"+es(p.contract||"-")+"</div></div><div><div class='dpl'>Final Destination</div><div class='dpv'>"+es(p.final_dest||"-")+"</div></div><div><div class='dpl'>ACID</div><div class='dpv'>"+es(p.acid||"-")+"</div></div></div></div>"
+  +"<div class='dps'><div class='dpst'>Operacion comercial <span class='holded-badge'>Holded</span></div><div class='dpg'><div><div class='dpl'>Num. Operacion</div><div class='dpv'>"+es(p.num)+"</div></div><div><div class='dpl'>Fecha</div><div class='dpv'>"+fd(p.fecha)+"</div></div><div><div class='dpl'>Cliente</div><div class='dpv'>"+es(p.cliente||"-")+"</div></div><div><div class='dpl'>Nº Pedido Cliente</div><div class='dpv'>"+es(p.customer_po||"-")+"</div></div><div><div class='dpl'>Responsable</div><div class='dpv'>"+es(p.responsable||"-")+"</div></div><div><div class='dpl'>Incoterm</div><div class='dpv'>"+es(p.incoterm||"-")+"</div></div><div><div class='dpl'>Payment Terms</div><div class='dpv'>"+es(p.payterms||"-")+"</div></div><div><div class='dpl'>Contrato</div><div class='dpv'>"+es(p.contract||"-")+"</div></div><div><div class='dpl'>Final Destination</div><div class='dpv'>"+es(p.final_dest||"-")+"</div></div><div><div class='dpl'>ACID</div><div class='dpv'>"+es(p.acid||"-")+"</div></div></div></div>"
   +"<div class='dps'><div class='dpst'>Compra <span class='holded-badge'>Holded PO</span></div><div class='dpg'><div><div class='dpl'>Proveedor</div><div class='dpv'>"+es(p.proveedor||"-")+"</div></div></div></div>"
   +"<div class='dps'><div class='dpst'>Transporte <span class='holded-badge'>Holded TO</span></div><div class='dpg'><div><div class='dpl'>Transportista</div><div class='dpv'>"+es(p.transportista||"-")+"</div></div></div></div>"
   +"<div class='dps'><div class='dpst'>Logistica <span class='notion-badge'>Notion</span></div><div class='dpg'><div><div class='dpl'>Modalidad</div><div class='dpv'>"+es(p.modalidad||"-")+"</div></div><div><div class='dpl'>Forwarder</div><div class='dpv'>"+es(p.forwarder||"-")+"</div></div><div><div class='dpl'>Naviera</div><div class='dpv'>"+es(p.naviera||"-")+"</div></div><div><div class='dpl'>Booking</div><div class='dpv'>"+es(p.booking||"-")+"</div></div><div><div class='dpl'>Buque</div><div class='dpv' style='color:var(--teal2)'>"+es(p.buque||"-")+"</div></div><div><div class='dpl'>IMO</div><div class='dpv' style='color:var(--teal2)'>"+es(p.imo||"-")+"</div></div><div><div class='dpl'>Equipo</div><div class='dpv'>"+es(p.equipo||"-")+"</div></div><div><div class='dpl'>Matrícula</div><div class='dpv'>"+es(p.matricula||"-")+"</div></div><div style='grid-column:span 2'><div class='dpl'>Nº Contenedor(es)</div><div class='dpv' style='color:var(--teal2)'>"+es(p.cont||"-")+"</div></div><div><div class='dpl'>F.Carga</div><div class='dpv'>"+fd(p.fcarga)+"</div></div><div><div class='dpl'>ETD</div><div class='dpv'>"+fd(p.etd)+"</div></div><div><div class='dpl'>ETA</div><div class='dpv'>"+fd(p.eta)+(p.eta&&p.estado==="IN TRANSIT"?" ("+du(p.eta)+"d)":"")+"</div></div><div><div class='dpl'>ATA</div><div class='dpv'>"+fd(p.ata)+"</div></div><div><div class='dpl'>Factura Venta</div><div class='dpv'>"+es(p.factura_n||"-")+"</div></div><div><div class='dpl'>Justificante</div><div class='dpv'>"+(p.justif?"✅ Recibido":"⏳ Pendiente")+"</div></div></div></div>"
@@ -921,8 +911,8 @@ function cd(){document.getElementById("overlay").classList.remove("open");}
 // ── EXPORT ────────────────────────────────────────────────────────────
 function expCSV(){
   var list=gf();
-  var f=["num","fecha","cliente","responsable","proveedor","transportista","estado","etd","eta","ata","factura","producto","incoterm","buque","imo","cont","obs"];
-  var h=["Operacion","Fecha","Cliente","Responsable","Proveedor","Transportista","Estado","ETD","ETA","ATA","Factura","Producto","Incoterm","Buque","IMO","Contenedores","Obs"];
+  var f=["num","fecha","cliente","customer_po","responsable","proveedor","transportista","estado","etd","eta","ata","factura","producto","incoterm","buque","imo","cont","obs"];
+  var h=["Operacion","Fecha","Cliente","Nº Pedido Cliente","Responsable","Proveedor","Transportista","Estado","ETD","ETA","ATA","Factura","Producto","Incoterm","Buque","IMO","Contenedores","Obs"];
   var rows=[h].concat(list.map(function(p){return f.map(function(k){return '"'+String(p[k]||"").replace(/"/g,'""')+'"';});}));
   var csv=rows.map(function(r){return r.join(",");}).join("\n");
   var a=document.createElement("a"); a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(csv); a.download="gfb_"+new Date().toISOString().slice(0,10)+".csv"; a.click();
